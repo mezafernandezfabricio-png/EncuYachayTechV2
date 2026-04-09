@@ -1,22 +1,22 @@
-# Etapa 1: Construir la aplicación
+# Etapa 1: Construir el proyecto
 FROM eclipse-temurin:17-jdk AS build
 WORKDIR /app
 
-# Copiamos todo el contenido del repositorio
+# Copiamos todo el contenido
 COPY . .
 
-# Buscamos el archivo mvnw donde sea que esté y le damos permisos
-RUN find . -name "mvnw" -exec chmod +x {} +
+# Damos permisos y compilamos
+RUN chmod +x mvnw
+RUN ./mvnw clean package -DskipTests
 
-# Ejecutamos la construcción (esto genera el archivo .jar)
-RUN find . -name "mvnw" -exec {} clean package -DskipTests \;
-
-# Etapa 2: Ejecutar la aplicación
+# Etapa 2: Ejecutar el proyecto
 FROM eclipse-temurin:17-jre
 WORKDIR /app
 
-# Buscamos el archivo .jar generado y lo copiamos para ejecutarlo
-COPY --from=build /app/**/target/*.jar app.jar
+# Esta es la linea clave: 
+# Copiamos el archivo generado desde la carpeta 'target' al nombre 'app.jar'
+COPY --from=build /app/target/*.jar app.jar
 
+# Exponemos el puerto y encendemos
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
