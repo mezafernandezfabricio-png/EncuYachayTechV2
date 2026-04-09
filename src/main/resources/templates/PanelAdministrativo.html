@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Panel de Administración | Yachay Tech</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-base: #FAF9F6; 
+            --surface-white: #FFFFFF;
+            --text-primary: #2A2A2A;
+            --text-secondary: #5A5A5A;
+            --text-muted: #8A8A8A;
+            --border-light: #EAE7E2;
+            --accent-gold: #B48C48;
+            --accent-gold-dark: #9B723C;
+            --accent-deep: #2C3E2F;
+            --shadow-sm: 0 12px 30px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.02);
+            --shadow-hover: 0 20px 35px -12px rgba(0, 0, 0, 0.12);
+            --radius-card: 20px;
+            --transition-base: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--surface-white); color: var(--text-primary); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+        .top-header { padding: 16px 40px; background: var(--surface-white); border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; z-index: 30; }
+        .top-header .brand { display: flex; align-items: center; gap: 15px; }
+        .top-header .brand img { height: 45px; width: auto; }
+        .header-title { font-weight: 600; font-size: 15px; color: var(--text-primary); margin-left: 20px; border-left: 1px solid var(--border-light); padding-left: 20px;}
+        .user-profile { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text-secondary); }
+        .avatar-circle { width: 36px; height: 36px; background: #C4A464; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; }
+
+        .main-layout { display: flex; flex: 1; overflow: hidden; }
+
+        .sidebar { width: 280px; background: var(--surface-white); border-right: 1px solid var(--border-light); display: flex; flex-direction: column; padding: 30px 20px; z-index: 20; justify-content: space-between; }
+        .menu-list { display: flex; flex-direction: column; gap: 8px; }
+        .menu-item { padding: 14px 20px; border-radius: 12px; color: var(--text-secondary); cursor: default; font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 16px; transition: var(--transition-base); }
+        .menu-item i { width: 24px; font-size: 1.1rem; color: var(--text-muted); text-align: center; }
+        .menu-item.active { background: #F6F3EB; color: var(--accent-gold-dark); font-weight: 600; }
+        .menu-item.active i { color: var(--accent-gold-dark); }
+        
+        .logout-btn { color: #D96A53; display: flex; align-items: center; gap: 16px; padding: 14px 20px; text-decoration: none; font-weight: 600; font-size: 15px; }
+        .logout-btn i { font-size: 1.1rem; }
+
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; background: var(--bg-base); position: relative; }
+        .content-area { padding: 60px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; animation: fadeUp 0.4s ease-out forwards; width: 100%; overflow-y: auto; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .dashboard-header { text-align: center; margin-bottom: 50px; }
+        h2 { font-family: 'Playfair Display', serif; font-size: 36px; margin-bottom: 12px; color: var(--text-primary); font-weight: 600; }
+        .dashboard-header p { color: var(--text-secondary); font-size: 15px; }
+
+        .cards-grid { display: flex; justify-content: center; gap: 40px; width: 100%; max-width: 900px; flex-wrap: wrap; }
+        
+        .admin-card { background: var(--surface-white); border-radius: var(--radius-card); padding: 40px 32px; width: 380px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); cursor: default; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between; border: 1px solid transparent; }
+        
+        .card-image-container { position: relative; width: 100%; height: 160px; margin-bottom: 24px; display: flex; align-items: center; justify-content: center; }
+        .card-image-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        
+        .image-title { position: absolute; font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 600; color: #1a1a1a; background: rgba(255,255,255,0.85); padding: 5px 20px; border-radius: 8px; backdrop-filter: blur(4px); }
+
+        .admin-card p { color: var(--text-secondary); font-size: 13.5px; line-height: 1.5; margin-bottom: 30px; padding: 0 10px; }
+        
+        .btn-card { background: #A8864F; color: white; border: none; padding: 14px 0; border-radius: 30px; font-weight: 500; font-size: 15px; width: 100%; cursor: default; display: flex; justify-content: center; align-items: center; gap: 8px; text-decoration: none; }
+
+        .bottom-footer { padding: 16px 40px; background: var(--surface-white); border-top: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted); z-index: 30; }
+        .footer-brand { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 14px; color: var(--accent-gold-dark); letter-spacing: 1px;}
+    </style>
+</head>
+<body>
+
+<div class="top-header">
+    <div class="brand">
+        <img th:src="@{/img/logo.png}" src="https://via.placeholder.com/150x50?text=YACHAY+TECH" alt="Yachay Tech Logo">
+        <span class="header-title">Resumen de Plataforma</span>
+    </div>
+    <div class="user-profile">
+        <span>Admin Yachay</span>
+        <div class="avatar-circle"><i class="fas fa-user-shield"></i></div>
+    </div>
+</div>
+
+<div class="main-layout">
+    
+    <div class="sidebar">
+        <div class="menu-list">
+            <div class="menu-item active" id="menu-inicio"><i class="fas fa-home"></i> Inicio</div>
+            <div class="menu-item" id="menu-mantenimiento"><i class="fas fa-tools"></i> Mantenimiento</div>
+            <div class="menu-item" id="menu-reportes"><i class="fas fa-chart-pie"></i> Reportes</div>
+        </div>
+        
+        <div>
+            <a th:href="@{/logout}" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </a>
+        </div>
+    </div>
+
+    <div class="main-wrapper">
+        <div id="sec-inicio" class="content-area">
+            
+            <div class="dashboard-header">
+                <h2>Gestión de Experiencia</h2>
+                <p>Bienvenido. Seleccione un módulo para comenzar la administración.</p>
+            </div>
+            
+            <div class="cards-grid">
+                
+				<div class="admin-card">
+				    <div class="card-image-container">
+				        <img th:src="@{/img/mante.jpeg}" src="https://cdn-icons-png.flaticon.com/512/2043/2043105.png" alt="Ilustración Mantenimiento">
+				        <div class="image-title">Mantenimiento</div>
+				    </div>
+				    <p>Edite las preguntas y opciones de la encuesta de satisfacción.</p>
+				    <div class="btn-card">Entrar <i class="fas fa-arrow-right"></i></div>
+				</div>
+
+				<div class="admin-card">
+				    <div class="card-image-container">
+				        <img th:src="@{/img/repots.jpeg}" src="https://cdn-icons-png.flaticon.com/512/1055/1055685.png" alt="Ilustración Reportes">
+				        <div class="image-title">Reportes</div>
+				    </div>
+				    <p>Analice los resultados y métricas de la disminución de las ventas</p>
+				    <div class="btn-card">Visualizar <i class="fas fa-arrow-right"></i></div>
+				</div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="bottom-footer">
+    <div class="footer-brand">YACHAY TECH</div>
+    <div>© 2025 Yachay Tech — Todos los derechos reservados</div>
+</div>
+
+</body>
+<script>
+    let tiempoInactividad;
+
+    function cerrarSesionPorInactividad() {
+        window.location.href = '/logout';
+    }
+
+    function reiniciarTemporizador() {
+        clearTimeout(tiempoInactividad);
+        tiempoInactividad = setTimeout(cerrarSesionPorInactividad, 180000); 
+    }
+
+    window.onload = reiniciarTemporizador;
+    document.onmousemove = reiniciarTemporizador;
+    document.onkeypress = reiniciarTemporizador;
+    document.ontouchstart = reiniciarTemporizador; 
+    document.onclick = reiniciarTemporizador;
+    document.onscroll = reiniciarTemporizador;
+</script>
+</html>
