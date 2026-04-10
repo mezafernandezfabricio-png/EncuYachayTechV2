@@ -144,27 +144,24 @@ public class LoginController {
         if (correo == null || correo.trim().isEmpty() || password == null || password.trim().isEmpty()) {
             model.addAttribute("error", "El correo y la contraseña son obligatorios.");
             model.addAttribute("tipoError", "admin"); 
-            if (correo != null && !correo.trim().isEmpty()) {
-                model.addAttribute("correoIngresado", correo);
-            }
             return "Login";
-        }
-
-        if (!correo.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-            model.addAttribute("error", "El formato del correo docente no es válido.");
-            model.addAttribute("tipoError", "admin");
-            return "Login"; 
         }
 
         Administrador admin = adminRepository.findByCorreoAndPassword(correo.trim(), password.trim());
         
         if (admin != null && admin.getEstado()) {
             session.setAttribute("adminLogueado", true);
+            
+            session.setAttribute("rolAdmin", admin.getRol()); 
+            session.setAttribute("adminNombre", admin.getNombre());
+            
             session.setMaxInactiveInterval(180); 
             redirectAttributes.addFlashAttribute("welcomeUser", admin.getNombre());
+            
             return "redirect:/admin/panel";
+            
         } else {
-            model.addAttribute("error", "Credenciales de docente incorrectas o usuario inactivo.");
+            model.addAttribute("error", "Credenciales incorrectas o usuario no autorizado.");
             model.addAttribute("tipoError", "admin"); 
             model.addAttribute("correoIngresado", correo); 
             return "Login";
@@ -184,6 +181,10 @@ public class LoginController {
         if (session.getAttribute("adminLogueado") == null) {
             return "redirect:/"; 
         }
+        
+        model.addAttribute("rolActual", session.getAttribute("rolAdmin"));
+        model.addAttribute("nombreAdmin", session.getAttribute("adminNombre"));
+        
         return "PanelAdministrativo"; 
     }
 

@@ -104,7 +104,7 @@
         .modal-icon { font-size: 40px; margin-bottom: 16px; color: var(--accent-gold); }
         .modal-title { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 22px; color: var(--text-primary); margin-bottom: 12px; }
         .modal-message { font-size: 14.5px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; }
-        .modal-input { text-align: center; font-size: 18px; letter-spacing: 2px; margin-bottom: 10px; width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: 8px; outline: none; transition: 0.3s;}
+        .modal-input { text-align: center; font-size: 18px; letter-spacing: 4px; margin-bottom: 10px; width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: 8px; outline: none; transition: 0.3s;}
         .modal-input:focus { border-color: var(--accent-gold); }
         .modal-buttons { display: flex; gap: 12px; margin-top: 20px; }
         .btn-cancel { background: #F6F4F0; color: var(--text-secondary); border: 1px solid var(--border-light); padding: 12px 0; border-radius: 40px; font-weight: 600; font-size: 15px; cursor: pointer; transition: var(--transition-base); width: 100%; }
@@ -159,7 +159,7 @@
             <form id="mainForm" th:action="@{/loginCliente}" method="post" novalidate>
 
                 <div class="form-group" id="correo-group">
-                    <label for="correo"><i class="fas fa-envelope"></i> Correo institucional</label>
+                    <label for="correo"><i class="fas fa-envelope"></i> Correo de usuario</label>
                     <input type="email" name="correo" id="correo" placeholder="@cibertec.edu.pe" th:value="${correoIngresado}" required />
                 </div>
 
@@ -169,13 +169,13 @@
                 </div>
 
                 <div class="form-group" id="pass-docente-group" style="display: none;">
-                    <label for="password"><i class="fas fa-lock"></i> Contraseña Docente</label>
+                    <label for="password" id="passDocenteLabel"><i class="fas fa-lock"></i> Contraseña de Acceso</label>
                     <input type="password" name="password" id="password" placeholder="••••••••" disabled required />
                 </div>
 
                 <div class="actions-row">
                     <button type="button" id="adminToggle" class="btn-admin-toggle">
-                        <i class="fas fa-chalkboard-teacher"></i> Acceso Docente
+                        <i class="fas fa-user-shield"></i> Personal Autorizado
                     </button>
                     <div class="remember-group" id="remember-group">
                         <input type="checkbox" id="rememberMe">
@@ -197,16 +197,16 @@
 
 <div class="modal-overlay" id="pinModal">
     <div class="modal-box" id="pinModalBox">
-        <div class="modal-icon"><i class="fas fa-user-shield"></i></div>
-        <div class="modal-title">Acceso Restringido</div>
-        <div class="modal-message">Ingrese la Clave de seguridad de Yachay Tech para habilitar el portal Docente.</div>
+        <div class="modal-icon"><i class="fas fa-key"></i></div>
+        <div class="modal-title">Acceso de Seguridad</div>
+        <div class="modal-message">Ingrese su PIN numérico asignado para habilitar la vista correspondiente.</div>
         
-        <input type="password" id="pinInput" class="modal-input" placeholder="••••••••" autocomplete="off" />
-        <div class="pin-error" id="pinErrorMsg"><i class="fas fa-exclamation-circle"></i> CLAVE incorrecto. Intente nuevamente.</div>
+        <input type="password" id="pinInput" class="modal-input" placeholder="" autocomplete="off" maxlength="6" inputmode="numeric" />
+        <div class="pin-error" id="pinErrorMsg"><i class="fas fa-exclamation-circle"></i> PIN incorrecto. Verifique y reintente.</div>
         
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" onclick="closePinModal()">Cancelar</button>
-            <button type="button" class="btn-accept" onclick="validatePin()">Validar Acceso</button>
+            <button type="button" class="btn-accept" onclick="validatePin()">Validar PIN</button>
         </div>
     </div>
 </div>
@@ -226,6 +226,7 @@
     
     const passDocenteGroup = document.getElementById('pass-docente-group');
     const passDocenteInput = document.getElementById('password');
+    const passDocenteLabel = document.getElementById('passDocenteLabel');
     
     const mainForm = document.getElementById('mainForm');
     const btnText = document.getElementById('btn-text');
@@ -244,7 +245,8 @@
 
     const badWords = ['puta', 'puto', 'mierda', 'cabron', 'cabròn', 'pendejo', 'imbecil', 'idiota', 'estupido', 'estùpido', 'perra', 'maldito', 'carajo', 'verga', 'cojudo', 'zorra'];
     
-    const PIN_DOCENTE = "docente123";
+    const PIN_ADMIN = "1234";
+    const PIN_DOCENTE = "5678";
 
     let modoActual = 'clienteLogin';
 
@@ -317,7 +319,7 @@
         
         btnText.innerText = "Iniciar sesión";
         btnIcon.className = "fas fa-arrow-right-to-bracket";
-        headerDesc.innerText = "Ingresa para realizar la encuesta.";
+        headerDesc.innerText = "Ingresa para realizar la simulación.";
         footerText.innerText = "Tus datos están protegidos y seguros.";
         hideError();
         
@@ -352,11 +354,42 @@
         
         btnText.innerText = "Crear cuenta";
         btnIcon.className = "fas fa-user-plus";
-        headerDesc.innerText = "Regístrate para empezar la encuesta.";
+        headerDesc.innerText = "Regístrate para empezar la simulación.";
         footerText.innerText = "Tus datos se usarán de manera Anónima.";
         hideError();
         
         mainForm.setAttribute('action', '/registroCliente');
+    }
+
+    function setModoAdmin() {
+        modoActual = 'admin';
+        docenteToggle.classList.add('active');
+        
+        authTabs.style.display = 'none'; 
+        docenteToggle.style.display = 'inline-flex';
+        rememberGroup.style.display = 'none'; 
+
+        correoGroup.style.display = 'block';
+        correoInput.disabled = false;
+        correoInput.required = true; 
+        correoInput.placeholder = "@yachaytech.com";
+
+        passClienteGroup.style.display = 'none';
+        passClienteInput.disabled = true;
+        passClienteInput.required = false;
+
+        passDocenteGroup.style.display = 'block';
+        passDocenteInput.disabled = false;
+        passDocenteInput.required = true;
+        passDocenteLabel.innerHTML = '<i class="fas fa-lock"></i> Contraseña de Admin';
+        
+        btnText.innerText = "Entrar como Admin";
+        btnIcon.className = "fas fa-user-cog";
+        headerDesc.innerText = "Acceso Total - Mantenimiento del Sistema.";
+        footerText.innerText = "Acceso restringido a Administradores.";
+        hideError();
+        
+        mainForm.setAttribute('action', '/admin/login');
     }
 
     function setModoDocente() {
@@ -370,7 +403,7 @@
         correoGroup.style.display = 'block';
         correoInput.disabled = false;
         correoInput.required = true; 
-        correoInput.placeholder = "ejemplo@correo.com";
+        correoInput.placeholder = "@yachaytech.com";
 
         passClienteGroup.style.display = 'none';
         passClienteInput.disabled = true;
@@ -379,14 +412,21 @@
         passDocenteGroup.style.display = 'block';
         passDocenteInput.disabled = false;
         passDocenteInput.required = true;
+        passDocenteLabel.innerHTML = '<i class="fas fa-lock"></i> Contraseña de Docente';
         
-        btnText.innerText = "Ingresar al Panel";
-        btnIcon.className = "fas fa-chalkboard-user";
-        headerDesc.innerText = "Panel de control para docentes.";
-        footerText.innerText = "Acceso restringido a personal autorizado.";
+        btnText.innerText = "Entrar como Docente";
+        btnIcon.className = "fas fa-chalkboard-teacher";
+        headerDesc.innerText = "Acceso a Reportes de Estudiantes.";
+        footerText.innerText = "Acceso restringido a Docentes.";
         hideError();
         
         mainForm.setAttribute('action', '/admin/login');
+    }
+
+    function setModoPersonalGenerico() {
+        setModoAdmin(); 
+        btnText.innerText = "Reintentar Acceso";
+        headerDesc.innerText = "Acceso Restringido - Personal";
     }
 
     function switchToLogin() {
@@ -406,7 +446,7 @@
     if (errorDiv) {
         const tipo = errorDiv.getAttribute('data-tipo');
         if (tipo === 'admin') {
-            setModoDocente(); 
+            setModoPersonalGenerico(); 
         } else if (tipo === 'clienteRegistro') {
             setModoClienteRegistro();
         } else {
@@ -420,7 +460,7 @@
         if (successDiv) successDiv.style.display = 'none';
         clearAllInputs(); 
 
-        if (modoActual === 'docente') {
+        if (modoActual === 'docente' || modoActual === 'admin') {
             setModoClienteLogin();
         } else {
             pinModal.classList.add('active');
@@ -436,7 +476,12 @@
     }
 
     function validatePin() {
-        if (pinInput.value === PIN_DOCENTE) {
+        const val = pinInput.value.trim();
+        
+        if (val === PIN_ADMIN) {
+            pinModal.classList.remove('active');
+            setModoAdmin();
+        } else if (val === PIN_DOCENTE) {
             pinModal.classList.remove('active');
             setModoDocente();
         } else {
@@ -509,11 +554,11 @@
                 }
             }
 
-        } else if (modoActual === 'docente') {
+        } else if (modoActual === 'docente' || modoActual === 'admin') {
             
             if (userEmail === "") {
                 e.preventDefault();
-                showError("Debes ingresar tu correo de docente.");
+                showError("Debes ingresar tu correo de acceso.");
                 correoInput.value = ""; 
                 return;
             }
