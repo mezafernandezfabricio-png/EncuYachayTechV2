@@ -16,17 +16,25 @@
             --radius-card: 32px; --radius-input: 16px;
             --transition-base: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
+        
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(145deg, #F0EDE8 0%, #FAF8F4 100%);
-            min-height: 100vh; display: flex; justify-content: center; align-items: center;
-            padding: 24px; margin: 0; position: relative;
+            min-height: 100vh; display: flex; flex-direction: column;
+            margin: 0; position: relative;
         }
         body::before {
             content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-image: radial-gradient(circle at 10% 20%, rgba(180, 140, 72, 0.03) 0%, transparent 50%);
             pointer-events: none;
+            z-index: 0;
         }
+        
+        .main-content {
+            flex: 1; display: flex; justify-content: center; align-items: center;
+            padding: 24px; width: 100%; z-index: 1; position: relative;
+        }
+
         .register-container { width: 100%; max-width: 520px; margin: 0 auto; animation: fadeSlideUp 0.5s ease-out; }
         @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .card { background: var(--surface-white); border-radius: var(--radius-card); box-shadow: var(--shadow-card); border: 1px solid rgba(234, 231, 226, 0.6); overflow: hidden; }
@@ -68,6 +76,20 @@
         }
         input[type="email"]:focus, input[type="password"]:focus, input[type="text"]:focus { border-color: var(--accent-gold); background-color: white; box-shadow: 0 0 0 3px rgba(180, 140, 72, 0.15); }
         input:disabled { background-color: #f0f0f0; cursor: not-allowed; opacity: 0.6; }
+
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear {
+            display: none;
+        }
+        
+        .password-wrapper { position: relative; width: 100%; }
+        .password-wrapper input { padding-right: 40px !important; }
+        .toggle-password { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); font-size: 16px; transition: var(--transition-base); z-index: 10; padding: 4px; }
+        .toggle-password:hover { color: var(--accent-gold); }
+
+        .password-helper {
+            font-size: 12px; color: var(--text-muted); margin-top: 8px; display: none; line-height: 1.4;
+        }
         
         .actions-row {
             display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; margin-top: -10px;
@@ -120,79 +142,98 @@
             40%, 80% { transform: translateX(5px); }
         }
         .shake-animation { animation: shake 0.4s ease-in-out; }
+
+        .bottom-footer { padding: 16px 40px; background: var(--surface-white); border-top: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted); z-index: 30; width: 100%; position: relative; }
+        .footer-brand { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 14px; color: var(--accent-gold-dark); letter-spacing: 1px;}
     </style>
 </head>
 <body>
 
-<div class="register-container">
-    <div class="card">
-        <div class="card-header">
-            <div class="brand">
-                <img th:src="@{/img/logo.png}" src="logo.png" alt="Yachay Tech Logo" class="brand-logo">
-                <div class="brand-tagline">
-                    <i class="fas fa-microchip"></i> innovación · experiencia · confianza
-                </div>
-            </div>
-            <p id="header-desc" style="color: var(--text-secondary); font-size: 15px; margin-top: 12px;">Bienvenido a nuestra plataforma.</p>
-        </div>
-
-        <div class="card-body">
-            
-            <div id="front-error" class="alert-error" style="display: none;"></div>
-
-			<div th:if="${error != null}" class="alert-error server-error" th:data-tipo="${tipoError}">
-			    <i class="fas fa-exclamation-circle"></i>
-			    <span th:text="${error}">Error de credenciales</span>
-			</div>
-
-            <div th:if="${success != null}" class="alert-success server-success">
-                <i class="fas fa-check-circle"></i>
-                <span th:text="${success}">Operación exitosa</span>
-            </div>
-
-            <div class="auth-tabs" id="authTabs" data-active="login">
-                <div class="auth-slider"></div>
-                <div class="auth-tab active" id="tabLogin" onclick="switchToLogin()">Iniciar sesión</div>
-                <div class="auth-tab" id="tabRegister" onclick="switchToRegister()">Crear cuenta</div>
-            </div>
-
-            <form id="mainForm" th:action="@{/loginCliente}" method="post" novalidate>
-
-                <div class="form-group" id="correo-group">
-                    <label for="correo"><i class="fas fa-envelope"></i> Correo de usuario</label>
-                    <input type="email" name="correo" id="correo" placeholder="@cibertec.edu.pe" th:value="${correoIngresado}" required />
-                </div>
-
-                <div class="form-group" id="pass-cliente-group">
-                    <label for="passwordCliente" id="passClienteLabel"><i class="fas fa-key"></i> Contraseña</label>
-                    <input type="password" name="passwordCliente" id="passwordCliente" placeholder="••••••••" required />
-                </div>
-
-                <div class="form-group" id="pass-docente-group" style="display: none;">
-                    <label for="password" id="passDocenteLabel"><i class="fas fa-lock"></i> Contraseña de Acceso</label>
-                    <input type="password" name="password" id="password" placeholder="••••••••" disabled required />
-                </div>
-
-                <div class="actions-row">
-                    <button type="button" id="adminToggle" class="btn-admin-toggle">
-                        <i class="fas fa-user-shield"></i> Personal Autorizado
-                    </button>
-                    <div class="remember-group" id="remember-group">
-                        <input type="checkbox" id="rememberMe">
-                        <label for="rememberMe">Recordar credenciales</label>
+<div class="main-content">
+    <div class="register-container">
+        <div class="card">
+            <div class="card-header">
+                <div class="brand">
+                    <img th:src="@{/img/logo.png}" src="logo.png" alt="Yachay Tech Logo" class="brand-logo">
+                    <div class="brand-tagline">
+                        <i class="fas fa-microchip"></i> innovación · experiencia · confianza
                     </div>
                 </div>
+                <p id="header-desc" style="color: var(--text-secondary); font-size: 15px; margin-top: 12px;">Bienvenido a nuestra plataforma.</p>
+            </div>
 
-                <button type="submit" id="submitBtn" class="btn-submit">
-                    <i class="fas fa-arrow-right-to-bracket" id="btnIcon"></i> <span id="btn-text">Iniciar sesión</span>
-                </button>
-            </form>
-        </div>
+            <div class="card-body">
+                
+                <div id="front-error" class="alert-error" style="display: none;"></div>
 
-        <div class="card-footer">
-            <i class="fas fa-shield-alt"></i> <span id="footer-text">Tus datos están protegidos y seguros.</span>
+                <div th:if="${error != null}" class="alert-error server-error" th:data-tipo="${tipoError}">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span th:text="${error}">Error de credenciales</span>
+                </div>
+
+                <div th:if="${success != null}" class="alert-success server-success">
+                    <i class="fas fa-check-circle"></i>
+                    <span th:text="${success}">Operación exitosa</span>
+                </div>
+
+                <div class="auth-tabs" id="authTabs" data-active="login">
+                    <div class="auth-slider"></div>
+                    <div class="auth-tab active" id="tabLogin" onclick="switchToLogin()">Iniciar sesión</div>
+                    <div class="auth-tab" id="tabRegister" onclick="switchToRegister()">Crear cuenta</div>
+                </div>
+
+                <form id="mainForm" th:action="@{/loginCliente}" method="post" novalidate>
+
+                    <div class="form-group" id="correo-group">
+                        <label for="correo"><i class="fas fa-envelope"></i> Correo de usuario</label>
+                        <input type="email" name="correo" id="correo" placeholder="@cibertec.edu.pe" th:value="${correoIngresado}" required />
+                    </div>
+
+                    <div class="form-group" id="pass-cliente-group">
+                        <label for="passwordCliente" id="passClienteLabel"><i class="fas fa-key"></i> Contraseña</label>
+                        <div class="password-wrapper">
+                            <input type="password" name="passwordCliente" id="passwordCliente" placeholder="••••••••" required />
+                            <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility('passwordCliente', this)"></i>
+                        </div>
+                        <div class="password-helper" id="passHelper">
+                            
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="pass-docente-group" style="display: none;">
+                        <label for="password" id="passDocenteLabel"><i class="fas fa-lock"></i> Contraseña de Acceso</label>
+                        <div class="password-wrapper">
+                            <input type="password" name="password" id="password" placeholder="••••••••" disabled required />
+                            <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility('password', this)"></i>
+                        </div>
+                    </div>
+
+                    <div class="actions-row">
+                        <button type="button" id="adminToggle" class="btn-admin-toggle">
+                            <i class="fas fa-user-shield"></i> Personal Autorizado
+                        </button>
+                        <div class="remember-group" id="remember-group">
+                            <input type="checkbox" id="rememberMe">
+                            <label for="rememberMe">Recordar credenciales</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="btn-submit">
+                        <i class="fas fa-arrow-right-to-bracket" id="btnIcon"></i> <span id="btn-text">Iniciar sesión</span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="card-footer">
+                <i class="fas fa-shield-alt"></i> <span id="footer-text">Tus datos están protegidos y seguros.</span>
+            </div>
         </div>
     </div>
+</div>
+
+<div class="bottom-footer">
+    <div class="footer-brand">YACHAY TECH</div>
+    <div>© 2026 Yachay Tech — Todos los derechos reservados</div>
 </div>
 
 <div class="modal-overlay" id="pinModal">
@@ -201,7 +242,11 @@
         <div class="modal-title">Acceso de Seguridad</div>
         <div class="modal-message">Ingrese su PIN numérico asignado para habilitar la vista correspondiente.</div>
         
-        <input type="password" id="pinInput" class="modal-input" placeholder="" autocomplete="off" maxlength="6" inputmode="numeric" />
+        <div class="password-wrapper" style="margin-bottom: 10px;">
+            <input type="password" id="pinInput" class="modal-input" style="margin-bottom: 0;" placeholder="" autocomplete="off" maxlength="6" inputmode="numeric" />
+            <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility('pinInput', this)"></i>
+        </div>
+
         <div class="pin-error" id="pinErrorMsg"><i class="fas fa-exclamation-circle"></i> PIN incorrecto. Verifique y reintente.</div>
         
         <div class="modal-buttons">
@@ -223,6 +268,7 @@
     const passClienteGroup = document.getElementById('pass-cliente-group');
     const passClienteInput = document.getElementById('passwordCliente');
     const passClienteLabel = document.getElementById('passClienteLabel');
+    const passHelper = document.getElementById('passHelper'); 
     
     const passDocenteGroup = document.getElementById('pass-docente-group');
     const passDocenteInput = document.getElementById('password');
@@ -274,6 +320,19 @@
         }
     });
 
+    function togglePasswordVisibility(inputId, iconElement) {
+        const input = document.getElementById(inputId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            iconElement.classList.remove('fa-eye');
+            iconElement.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            iconElement.classList.remove('fa-eye-slash');
+            iconElement.classList.add('fa-eye');
+        }
+    }
+
     function showError(msg) {
         frontError.innerHTML = `<i class="fas fa-exclamation-circle"></i> <span>${msg}</span>`;
         frontError.style.display = 'flex';
@@ -312,6 +371,7 @@
         passClienteInput.disabled = false;
         passClienteInput.required = true;
         passClienteLabel.innerHTML = '<i class="fas fa-key"></i> Contraseña';
+        passHelper.style.display = 'none';
 
         passDocenteGroup.style.display = 'none';
         passDocenteInput.disabled = true;
@@ -331,6 +391,7 @@
         docenteToggle.classList.remove('active');
         
         docenteToggle.style.display = 'none';
+		rememberMeCheck.checked = false;
         rememberGroup.style.display = 'none'; 
         
         authTabs.style.display = 'flex';
@@ -347,6 +408,7 @@
         passClienteInput.disabled = false;
         passClienteInput.required = true;
         passClienteLabel.innerHTML = '<i class="fas fa-user-lock"></i> Crea una contraseña';
+        passHelper.style.display = 'block'; 
 
         passDocenteGroup.style.display = 'none';
         passDocenteInput.disabled = true;
@@ -377,6 +439,7 @@
         passClienteGroup.style.display = 'none';
         passClienteInput.disabled = true;
         passClienteInput.required = false;
+        passHelper.style.display = 'none'; 
 
         passDocenteGroup.style.display = 'block';
         passDocenteInput.disabled = false;
@@ -408,6 +471,7 @@
         passClienteGroup.style.display = 'none';
         passClienteInput.disabled = true;
         passClienteInput.required = false;
+        passHelper.style.display = 'none'; 
 
         passDocenteGroup.style.display = 'block';
         passDocenteInput.disabled = false;
@@ -540,6 +604,14 @@
                     passClienteInput.value = ""; 
                     return;
                 }
+                
+                const securityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$/;
+                if (!securityRegex.test(passCliente)) {
+                    e.preventDefault();
+                    showError("La contraseña debe tener (Mayúscula, minúscula, un caracter especial y minimo 8 caracteres)");
+                    passClienteInput.value = ""; 
+                    return;
+                }
             }
             
             if (modoActual === 'clienteLogin') {
@@ -569,6 +641,7 @@
                 return;
             }
         }
+		
     });
 </script>
 

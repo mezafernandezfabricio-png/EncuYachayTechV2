@@ -13,7 +13,8 @@ public class Cliente {
     private String nombre;
     private String correo;
     private String password; 
-
+    private Boolean estado = true; 
+    
     @Column(name = "fecha_registro", insertable = false, updatable = false)
     private LocalDateTime fechaRegistro;
 
@@ -31,4 +32,10 @@ public class Cliente {
     
     public LocalDateTime getFechaRegistro() { return fechaRegistro; }
     public void setFechaRegistro(LocalDateTime fechaRegistro) { this.fechaRegistro = fechaRegistro; }
+	public Boolean getEstado() {
+		return estado;
+	}
+	public void setEstado(Boolean estado) {
+		this.estado = estado;
+	}
 }

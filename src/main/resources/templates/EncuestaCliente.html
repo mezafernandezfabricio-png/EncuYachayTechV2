@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Yachay Tech | Encuesta de Experiencia</title>
+    <title>Yachay Tech | Simulador Estratégico</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -17,7 +17,9 @@
             --radius-card: 24px; --radius-element: 16px;
             --transition-base: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-base); color: var(--text-primary); display: flex; height: 100vh; overflow: hidden; line-height: 1.45; }
+        
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-base); color: var(--text-primary); display: flex; flex-direction: column; height: 100vh; overflow: hidden; line-height: 1.45; }
+        .main-layout { display: flex; flex: 1; overflow: hidden; width: 100%; }
 
         .sidebar { width: 300px; background: var(--surface-white); backdrop-filter: blur(0px); border-right: 1px solid var(--border-light); display: flex; flex-direction: column; z-index: 20; transition: var(--transition-base); box-shadow: 2px 0 12px rgba(0, 0, 0, 0.02); }
         .brand { padding: 32px 28px; border-bottom: 1px solid var(--border-light); margin-bottom: 20px; text-align: center; }
@@ -26,7 +28,11 @@
         .brand img:hover { transform: scale(1.03); }
 
         .brand p { font-size: 12px; color: var(--text-muted); margin-top: 6px; letter-spacing: 0.3px; }
-        .menu-list { flex: 1; padding: 16px 12px; overflow-y: auto; display: flex; flex-direction: column; }
+        
+        .menu-list { flex: 1; padding: 0 12px 16px 12px; overflow-y: auto; display: flex; flex-direction: column; }
+        
+        .sidebar-footer { padding: 16px 12px; border-top: 1px solid var(--border-light); background: var(--surface-white); }
+        
         .menu-item { padding: 14px 18px; margin-bottom: 6px; border-radius: 14px; color: var(--text-secondary); cursor: pointer; font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 14px; transition: var(--transition-base); background: transparent; }
         .menu-item i { width: 24px; font-size: 1.2rem; color: var(--text-muted); transition: var(--transition-base); }
         .menu-item:hover { background: #F0EEE9; color: var(--accent-gold-dark); }
@@ -48,28 +54,15 @@
         h2 { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px; letter-spacing: -0.3px; border-left: 4px solid var(--accent-gold); padding-left: 20px; }
         .instruction { font-size: 14px; color: var(--text-muted); background: #F9F7F3; padding: 10px 18px; border-radius: 40px; display: inline-block; margin-bottom: 28px; border: 1px solid var(--border-light); }
 
-        .carousel-container { position: relative; width: 100%; border-radius: var(--radius-element); overflow: hidden; border: 1px solid var(--border-light); background: #FFFFFF; box-shadow: 0 4px 20px rgba(0,0,0,0.03); padding-bottom: 20px; }
-        .carousel-slide { display: flex; width: 100%; } 
-        
-        .carousel-item { min-width: 100%; display: flex; flex-direction: column; align-items: center; padding: 30px 60px; }
-        .carousel-item img { max-width: 100%; max-height: 100%; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.08)); transition: transform 0.3s ease; }
-        .carousel-item img:hover { transform: scale(1.05); }
-        
-        .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: white; border: 1px solid var(--border-light); width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05); color: var(--text-secondary); transition: var(--transition-base); z-index: 2; outline: none; }
-        .carousel-btn:hover { color: var(--accent-gold); border-color: var(--accent-gold); box-shadow: 0 4px 12px rgba(180, 140, 72, 0.2); }
-        .carousel-btn.prev { left: 16px; }
-        .carousel-btn.next { right: 16px; }
-        
-        .carousel-dots { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 2; }
-        .carousel-dots .dot { width: 8px; height: 8px; border-radius: 50%; background: #D6CEC2; cursor: pointer; transition: 0.3s ease; }
-        .carousel-dots .dot.active { background: var(--accent-gold); transform: scale(1.3); }
-
         .footer-nav { padding: 20px 48px 32px; background: transparent; display: flex; justify-content: flex-end; gap: 18px; border-top: 1px solid rgba(234, 231, 226, 0.7); background: rgba(246, 244, 240, 0.6); backdrop-filter: blur(12px); }
         .btn { padding: 12px 32px; border-radius: 40px; font-weight: 600; font-size: 14px; cursor: pointer; transition: var(--transition-base); border: 1px solid transparent; background: white; color: var(--text-secondary); border-color: var(--border-light); font-family: 'Inter', sans-serif; }
         .btn:hover { background: #F5F2ED; transform: translateY(-2px); }
         .btn-primary { background: linear-gradient(105deg, var(--accent-gold) 0%, var(--accent-gold-dark) 100%); color: white; border: none; box-shadow: 0 2px 6px rgba(180, 140, 72, 0.2); }
         .btn-primary:hover { background: linear-gradient(105deg, #c49a53 0%, #a77e42 100%); transform: translateY(-2px); box-shadow: 0 8px 18px rgba(180, 140, 72, 0.25); }
-
+        
+        .bottom-footer { padding: 16px 40px; background: var(--surface-white); border-top: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted); z-index: 30; width: 100%; }
+        .footer-brand { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 14px; color: var(--accent-gold-dark); letter-spacing: 1px;}
+        
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
         .modal-overlay.active { opacity: 1; visibility: visible; }
         .modal-box { background: var(--surface-white); border-radius: var(--radius-card); padding: 36px 40px; width: 90%; max-width: 420px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); text-align: center; transform: scale(0.95) translateY(10px); transition: all 0.3s ease; }
@@ -81,154 +74,266 @@
         .modal-title { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 22px; color: var(--accent-deep); margin-bottom: 12px; letter-spacing: -0.5px; }
         .modal-message { font-size: 15px; color: var(--text-secondary); margin-bottom: 28px; line-height: 1.5; }
         .modal-btn { width: 100%; padding: 14px; }
-        @media (max-width: 880px) { .sidebar { width: 260px; } .content-area { padding: 24px; } .step-container { padding: 28px; } h2 { font-size: 24px; } .carousel-item { padding: 20px; } }
-        @media (max-width: 700px) { body { flex-direction: column; height: auto; overflow: auto; } .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; border-right: none; border-bottom: 1px solid var(--border-light); } .brand { padding: 16px; width: 100%; } .menu-list { display: flex; overflow-x: auto; padding: 12px; gap: 6px; } .menu-item { white-space: nowrap; } .main-wrapper { height: auto; } }
-        .survey-note { font-size: 12px; text-align: center; margin-top: 20px; color: var(--text-muted); }
+        
+        .flip-card {
+            background-color: transparent;
+            width: 100%;
+            height: 440px;
+            perspective: 1000px;
+            cursor: pointer;
+            margin-top: 32px;
+        }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .flip-card.is-flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: var(--radius-element);
+            box-shadow: var(--shadow-sm);
+        }
+        .flip-card-front {
+            background-color: #EAE7E2;
+        }
+        .flip-card-front img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: var(--radius-element);
+        }
+        .flip-card-front::after {
+            content: "Haz clic para voltear y leer";
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            backdrop-filter: blur(4px);
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .flip-card-back {
+            background-color: var(--surface-white);
+            transform: rotateY(180deg);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border: 1px solid var(--border-light);
+            overflow-y: auto;
+        }
+        
+        @media (max-width: 880px) { .sidebar { width: 260px; } .content-area { padding: 24px; } .step-container { padding: 28px; } h2 { font-size: 24px; } }
+        @media (max-width: 700px) { 
+            body { height: auto; overflow: auto; } 
+            .main-layout { flex-direction: column; height: auto; overflow: visible; } 
+            .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; border-right: none; border-bottom: 1px solid var(--border-light); } 
+            .brand { padding: 16px; width: 100%; margin-bottom: 0; } 
+            .menu-list { display: flex; overflow-x: auto; padding: 12px; gap: 6px; flex: 1; } 
+            .sidebar-footer { border-top: none; border-left: 1px solid var(--border-light); padding: 12px; display: flex; align-items: center; justify-content: center; }
+            .menu-item { white-space: nowrap; margin-bottom: 0; } 
+            .main-wrapper { height: auto; }
+            .flip-card { height: 450px; }
+        }
+        
+        .option-label { display: flex; align-items: center; gap: 14px; padding: 16px; border: 1px solid var(--border-light); border-radius: 12px; cursor: pointer; transition: var(--transition-base); background: var(--surface-white); }
+        .option-label:hover { border-color: var(--accent-gold); background: #FCFAF7; }
+        .option-label input[type="radio"] { accent-color: var(--accent-gold); width: 18px; height: 18px; }
     </style>
 </head>
 <body>
 
-<div class="sidebar">
-    <div class="brand">
-        <img th:src="@{/img/logo.png}" src="logo.png" alt="Yachay Tech Logo">
-        <p>experiencia · innovación · confianza</p>
+<div class="main-layout">
+    
+    <div class="sidebar">
+        <div class="brand">
+            <img th:src="@{/img/logo.png}" src="logo.png" alt="Yachay Tech Logo">
+            <p>experiencia · innovación · confianza</p>
+        </div>
+        <div class="menu-list">
+            <div class="menu-item active" id="menu-step-1" onclick="goToStep(1)"><i class="fas fa-building"></i> Empresa</div>
+            <div class="menu-item" id="menu-step-2" onclick="goToStep(2)"><i class="fas fa-tablet-alt"></i> Producto</div>
+            <div class="menu-item" id="menu-step-3" onclick="goToStep(3)"><i class="fas fa-chart-pie"></i> Mercado</div>
+            <div class="menu-item" id="menu-step-4" onclick="goToStep(4)"><i class="fas fa-user-graduate"></i> Tu Rol</div>
+            
+            <div th:each="pregunta, iterStat : ${preguntas}" 
+                 th:id="'menu-step-' + (${iterStat.count} + 4)" 
+                 th:onclick="'goToStep(' + (${iterStat.count} + 4) + ')'" 
+                 class="menu-item">
+                <i class="fas fa-gamepad"></i> Pregunta <span th:text="${iterStat.count}"></span>
+            </div>
+        </div>
+        
+        <div class="sidebar-footer">
+            <a th:href="@{/logout}" class="menu-item" style="margin-bottom: 0; color: #D9775A; text-decoration: none; justify-content: center; background: #FFF5F3;">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </a>
+        </div>
     </div>
-    <div class="menu-list">
-        <div class="menu-item active" id="menu-step-1" onclick="goToStep(1)"><i class="fas fa-chalkboard-user"></i> Introducción</div>
-        <div class="menu-item" id="menu-step-2" onclick="goToStep(2)"><i class="fas fa-cart-shopping"></i> Nuestro catálogo</div>
-        <a th:href="@{/logout}" class="menu-item" style="margin-top: auto; color: #D9775A; text-decoration: none;">
-            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-        </a>
+
+    <div class="main-wrapper">
+        <div class="header">
+            <span class="progress-label"><i class="fas fa-chart-line" style="margin-right: 6px;"></i> Progreso general</span>
+            <div class="progress-container">
+                <div class="progress-bar-fill" id="progress-bar"></div>
+            </div>
+            <span class="progress-text" id="progress-text">Cargando...</span>
+        </div>
+
+        <div class="content-area">
+            <form id="surveyForm" th:action="@{/guardarRespuesta}" method="post" style="width: 100%;">
+                
+                <div class="step-container active" id="step-1">
+                    <h2>Información de la Empresa</h2>
+                    <div class="flip-card" onclick="this.classList.toggle('is-flipped')">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <img th:src="@{/img/InfoEmpresa.png}" src="https://via.placeholder.com/800x400/EAE7E2/8A8A8A?text=Sede+Yachay+Tech" alt="Empresa Yachay Tech">
+                            </div>
+                            <div class="flip-card-back">
+                                <h3 style="font-family: 'Inter', sans-serif; font-size: 1.3rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 600;">YACHAY – TECH</h3>
+                                <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.7; text-align: justify; margin-bottom: 12px;">
+                                    Fundada en 2023 por un grupo de ingenieros y especialistas en educación, nace con la misión de <strong>"Cerrar la brecha digital en el Perú con tecnología soberana"</strong>, tras observar que las grandes marcas globales no diseñan productos pensando en la accidentada geografía peruana o en la economía de las familias de provincias.
+                                </p>
+                                <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.7; text-align: justify;">
+                                    Su nombre proviene del quechua <em>Yachay</em> (Saber/Aprender) y busca transmitir esa esencia tecnológica con inclusión digital para todos los peruanos.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-container" id="step-2">
+                    <h2>Información del Producto</h2>
+                    <div class="flip-card" onclick="this.classList.toggle('is-flipped')">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <img th:src="@{/img/InfoProducto.png}" src="https://via.placeholder.com/800x400/EAE7E2/8A8A8A?text=Tablet+Kallpa" alt="Tablet Kallpa">
+                            </div>
+                            <div class="flip-card-back">
+                                <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.7; text-align: justify; margin-bottom: 16px;">
+                                    En el último año han lanzado al mercado una Tablet bajo la marca <strong>"Kallpa"</strong>.
+                                </p>
+                                <ul style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.8; list-style-position: inside; text-align: left;">
+                                    <li style="margin-bottom: 8px;"><strong>Especificaciones Técnicas:</strong> Procesador de alto rendimiento para multitarea, batería de larga duración (ideal para zonas con cortes de energía) y pantalla con filtro de luz azul para lectura prolongada.</li>
+                                    <li style="margin-bottom: 8px;"><strong>Valor Agregado:</strong> Incluye "Yachay-Hub", una plataforma preinstalada con contenido educativo del Ministerio de Educación (MINEDU) que funciona sin conexión a internet.</li>
+                                    <li><strong>Precio:</strong> S/ 850.00, un 40% más económica que una marca de alta gama.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-container" id="step-3">
+                    <h2>Situación del Mercado</h2>
+                    <div class="flip-card" onclick="this.classList.toggle('is-flipped')">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <img th:src="@{/img/SituaMercado.png}" src="https://via.placeholder.com/800x400/EAE7E2/8A8A8A?text=Mercado+Local" alt="Análisis de Mercado">
+                            </div>
+                            <div class="flip-card-back">
+                                <ul style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.8; list-style-position: inside; text-align: left;">
+                                    <li style="margin-bottom: 12px;"><strong>El Cliente:</strong> Estudiantes de institutos y universidades en regiones como Cusco, Huancayo y Arequipa. Son jóvenes de 17 a 25 años (Generación Z) que buscan independencia, pero cuya compra suele ser financiada o aprobada por sus padres (Generación X).</li>
+                                    <li style="margin-bottom: 12px;"><strong>El Problema:</strong> Aunque el producto es superior en software local, el consumidor peruano tiene una fuerte creencia que la tecnología local es "ensamblada y de corta vida". Prefieren pagar más por una marca coreana o estadounidense solo por el "estatus" y la percepción de seguridad.</li>
+                                    <li><strong>Canales de Venta:</strong> Tienda online propia, presencia en "marketplaces" como Falabella y pequeñas tiendas tecnológicas en centros comerciales regionales.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-container" id="step-4">
+                    <h2>Rol del Estudiante</h2>
+                    <div class="flip-card" onclick="this.classList.toggle('is-flipped')">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <img th:src="@{/img/RolEstudiante.png}" src="https://via.placeholder.com/800x400/EAE7E2/8A8A8A?text=Consultor" alt="Rol del estudiante">
+                            </div>
+                            <div class="flip-card-back">
+                                <p style="font-size: 1rem; color: var(--text-primary); font-weight: 500; margin-bottom: 16px; text-align: center;">
+                                    Deberá asumir el rol de consultor de marketing frente a la empresa Yachay-Tech, con el objetivo de analizar y comprender el proceso de decisión de compra del cliente peruano.
+                                </p>
+                                <div style="background: #FCFAF7; padding: 18px 20px; border-radius: 12px; border-left: 4px solid var(--accent-gold); border-top: 1px solid var(--border-light); border-right: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light); text-align: left; width: 100%;">
+                                    <p style="font-size: 0.95rem; color: var(--accent-deep); font-weight: 600; margin-bottom: 6px;"><i class="fas fa-key" style="color: var(--accent-gold); margin-right: 6px;"></i> Regla clave:</p>
+                                    <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6;">
+                                        No existen decisiones “incorrectas”. Cada elección abre un camino con consecuencias diferentes que impactarán en la toma de decisiones al momento de implementar acciones estratégicas.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:each="pregunta, iterStat : ${preguntas}" 
+                     th:id="'step-' + (${iterStat.count} + 4)" 
+                     class="step-container">
+                    
+                    <h2 th:text="'Pregunta ' + ${iterStat.count}"></h2>
+                    <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 28px;">
+                        <span th:text="'Fase: ' + ${pregunta.fase}" style="font-weight: bold; margin-right: 10px;"></span> 
+                        Lee cuidadosamente la situación y elige el mejor camino estratégico.
+                    </p>
+                    
+                    <h3 style="font-size: 1.15rem; color: var(--text-primary); margin-bottom: 24px; font-weight: 600; line-height: 1.5;"
+                        th:text="${pregunta.enunciado}">
+                    </h3>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 14px;">
+                        <label class="option-label">
+                            <input type="radio" th:name="'respuesta_' + ${pregunta.id}" value="A" required>
+                            <span style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.5;" th:text="'A) ' + ${pregunta.opcionA}"></span>
+                        </label>
+                        
+                        <label class="option-label">
+                            <input type="radio" th:name="'respuesta_' + ${pregunta.id}" value="B" required>
+                            <span style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.5;" th:text="'B) ' + ${pregunta.opcionB}"></span>
+                        </label>
+                        
+                        <label class="option-label">
+                            <input type="radio" th:name="'respuesta_' + ${pregunta.id}" value="C" required>
+                            <span style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.5;" th:text="'C) ' + ${pregunta.opcionC}"></span>
+                        </label>
+                        
+                        <label class="option-label">
+                            <input type="radio" th:name="'respuesta_' + ${pregunta.id}" value="D" required>
+                            <span style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.5;" th:text="'D) ' + ${pregunta.opcionD}"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div th:if="${preguntas == null or preguntas.isEmpty()}" class="step-container" id="step-5">
+                    <h2>Simulador de decisiones</h2>
+                    <p style="color: var(--text-muted); text-align: center; margin-top: 40px;">El administrador aún no ha configurado las preguntas de la simulación.</p>
+                </div>
+                
+            </form>
+        </div>
+
+        <div class="footer-nav">
+            <button type="button" class="btn" id="btn-prev" style="display: none;" onclick="changeStep(-1)"><i class="fas fa-chevron-left"></i> Anterior</button>
+            <button type="button" class="btn btn-primary" id="btn-next" onclick="changeStep(1)">Siguiente <i class="fas fa-chevron-right"></i></button>
+        </div>
     </div>
 </div>
 
-<div class="main-wrapper">
-    <div class="header">
-        <span class="progress-label"><i class="fas fa-chart-line" style="margin-right: 6px;"></i> Progreso general</span>
-        <div class="progress-container">
-            <div class="progress-bar-fill" id="progress-bar"></div>
-        </div>
-        <span class="progress-text" id="progress-text">Cargando...</span>
-    </div>
-
-    <div class="content-area">
-        <form id="surveyForm" th:action="@{/guardarRespuesta}" method="post" style="width: 100%;">
-            
-            <div class="step-container active" id="step-1">
-                <h2>Introducción</h2>
-                
-                <div style="display: flex; gap: 32px; margin-top: 32px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
-                    <div style="flex: 1; min-width: 250px;">
-                        <img th:src="@{/img/intro.png}" src="https://via.placeholder.com/400x250/EAE7E2/8A8A8A?text=Tienda+Yachay+Tech" alt="Tienda Yachay Tech" style="width: 100%; border-radius: 12px; object-fit: cover; box-shadow: var(--shadow-sm);">
-                    </div>
-                    
-                    <div style="flex: 1.5; min-width: 300px;">
-                        <h3 style="font-family: 'Inter', sans-serif; font-size: 1.4rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 600;">Yachay Tech</h3>
-                        <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.7; text-align: justify;">
-                            En Yachay-Tech somos una empresa dedicada a la comercialización de productos tecnológicos, comprometida con brindar soluciones modernas y accesibles a nuestros clientes. Nos enfocamos en entender sus necesidades y mejorar continuamente nuestros servicios para ofrecer una mejor experiencia de compra en un mercado competitivo.
-                        </p>
-                    </div>
-                </div>
-
-                <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.7; text-align: justify; margin-bottom: 40px;">
-                    Ofrecemos una plataforma digital de encuestas que te permite compartir tu opinión de forma rápida y sencilla. A través de esta herramienta, recopilamos información clave que nos ayuda a mejorar nuestros productos y servicios, garantizando una atención más eficiente y adaptada a lo que realmente necesitas.
-                </p>
-                
-                <div style="text-align: center;">
-                    <div class="survey-note" style="background: #FCFAF7; padding: 12px 24px; border-radius: 8px; border: 1px solid var(--border-light); display: inline-block; margin-top: 0; font-size: 12px; color: var(--text-muted);">
-                        <i class="fas fa-lock"></i> Esta información es administrada por Yachay Tech.
-                    </div>
-                </div>
-            </div>
-
-            <div class="step-container" id="step-2" style="background: transparent; border: none; box-shadow: none; padding: 0;">
-                
-                <h2>Nuestro catálogo de productos</h2>
-                <p style="font-size: 1.05rem; color: var(--text-secondary); margin-bottom: 24px;">
-                    Conocer tus preferencias nos ayuda a optimizar nuestro inventario. A continuación, te compartimos las tendencias actuales de compras en Yachay Tech:
-                </p>
-
-                <div class="carousel-container">
-                    <div class="carousel-slide" id="productCarousel">
-                        
-                        <div class="carousel-item" data-index="0">
-                            <div style="background: #FCFAF7; border-radius: 16px; padding: 20px; margin-bottom: 16px; height: 180px; width: 100%; max-width: 280px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-light);">
-                                <img th:src="@{/img/laptop.png}" src="https://via.placeholder.com/200x150?text=Laptop" alt="Laptop Ultraligera">
-                            </div>
-                            <h3 style="font-size: 20px; font-weight: 600; color: var(--text-primary); margin-bottom: 30px;">Laptop Ultraligera</h3>
-                            
-                            <div style="background: #FCFAF7; border: 1px solid rgba(180, 140, 72, 0.15); border-radius: 16px; padding: 28px; width: 100%; text-align: left;">
-                                <div style="font-size: 12px; font-weight: 700; color: var(--accent-gold-dark); letter-spacing: 1px; margin-bottom: 12px;">DESCRIPCIÓN</div>
-                                <p style="font-size: 14.5px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px;">
-                                    Potencia tu productividad con lo último en procesamiento. Pantalla Retina, 16GB RAM y diseño ultra delgado para profesionales exigentes.
-                                </p>
-                                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                                    <span style="background: rgba(180, 140, 72, 0.06); color: var(--accent-gold-dark); border: 1px solid rgba(180, 140, 72, 0.25); padding: 8px 16px; border-radius: 30px; font-size: 13px; font-weight: 600;">Chip M3</span>
-                                    <span style="background: rgba(180, 140, 72, 0.06); color: var(--accent-gold-dark); border: 1px solid rgba(180, 140, 72, 0.25); padding: 8px 16px; border-radius: 30px; font-size: 13px; font-weight: 600;">18h batería</span>
-                                    <span style="background: rgba(180, 140, 72, 0.06); color: var(--accent-gold-dark); border: 1px solid rgba(180, 140, 72, 0.25); padding: 8px 16px; border-radius: 30px; font-size: 13px; font-weight: 600;">512GB SSD</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="carousel-item" data-index="1">
-                            <div style="background: #FCFAF7; border-radius: 16px; padding: 20px; margin-bottom: 16px; height: 180px; width: 100%; max-width: 280px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-light);">
-                                <img th:src="@{/img/cel.png}" src="https://via.placeholder.com/120x160?text=Smartphone" alt="Smartphone Gama Alta">
-                            </div>
-                            <h3 style="font-size: 20px; font-weight: 600; color: var(--text-primary); margin-bottom: 30px;">Smartphone Gama Alta</h3>
-                            
-                            <div style="background: #FCFAF7; border: 1px solid rgba(180, 140, 72, 0.15); border-radius: 16px; padding: 28px; width: 100%; text-align: left;">
-                                <div style="font-size: 12px; font-weight: 700; color: var(--accent-gold-dark); letter-spacing: 1px; margin-bottom: 12px;">DESCRIPCIÓN</div>
-                                <p style="font-size: 14.5px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px;">
-                                    Captura tu mundo con una lente de nivel profesional. Rendimiento excepcional, pantalla fluida y conectividad de última generación.
-                                </p>
-                                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                                    <span style="background: rgba(180, 140, 72, 0.06); color: var(--accent-gold-dark); border: 1px solid rgba(180, 140, 72, 0.25); padding: 8px 16px; border-radius: 30px; font-size: 13px; font-weight: 600;">Cámara 108MP</span>
-                                    <span style="background: rgba(180, 140, 72, 0.06); color: var(--accent-gold-dark); border: 1px solid rgba(180, 140, 72, 0.25); padding: 8px 16px; border-radius: 30px; font-size: 13px; font-weight: 600;">Pantalla 120Hz</span>
-                                    <span style="background: rgba(180, 140, 72, 0.06); color: var(--accent-gold-dark); border: 1px solid rgba(180, 140, 72, 0.25); padding: 8px 16px; border-radius: 30px; font-size: 13px; font-weight: 600;">Red 5G</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="carousel-item" data-index="2">
-                            <div style="background: #FCFAF7; border-radius: 16px; padding: 20px; margin-bottom: 16px; height: 180px; width: 100%; max-width: 280px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-light);">
-                                <img th:src="@{/img/tablet.png}" src="https://via.placeholder.com/200x150?text=Tablet" alt="Tablet Premium">
-                            </div>
-                            <h3 style="font-size: 20px; font-weight: 600; color: var(--text-primary); margin-bottom: 30px;">Tablet Premium</h3>
-                            
-                            <div style="background: #FCFAF7; border: 1px solid rgba(180, 140, 72, 0.15); border-radius: 16px; padding: 28px; width: 100%; text-align: left;">
-                                <div style="font-size: 12px; font-weight: 700; color: var(--accent-gold-dark); letter-spacing: 1px; margin-bottom: 12px;">DESCRIPCIÓN</div>
-                                <p style="font-size: 14.5px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px;">
-                                    Tu lienzo digital portátil. Resolución inmersiva y soporte para stylus, ideal para creativos, estudiantes y profesionales en movimiento.
-                                </p>
-                                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                                    <span style="background: rgba(180, 140, 72, 0.06); color: var(--accent-gold-dark); border: 1px solid rgba(180, 140, 72, 0.25); padding: 8px 16px; border-radius: 30px; font-size: 13px; font-weight: 600;">Pantalla 2K</span>
-                                    <span style="background: rgba(180, 140, 72, 0.06); color: var(--accent-gold-dark); border: 1px solid rgba(180, 140, 72, 0.25); padding: 8px 16px; border-radius: 30px; font-size: 13px; font-weight: 600;">Stylus Incluido</span>
-                                    <span style="background: rgba(180, 140, 72, 0.06); color: var(--accent-gold-dark); border: 1px solid rgba(180, 140, 72, 0.25); padding: 8px 16px; border-radius: 30px; font-size: 13px; font-weight: 600;">8000 mAh</span>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                    
-                    <button type="button" class="carousel-btn prev" onclick="moveCarousel(-1)"><i class="fas fa-chevron-left"></i></button>
-                    <button type="button" class="carousel-btn next" onclick="moveCarousel(1)"><i class="fas fa-chevron-right"></i></button>
-                    
-                    <div class="carousel-dots">
-                        <span class="dot active" onclick="setCarousel(0)"></span>
-                        <span class="dot" onclick="setCarousel(1)"></span>
-                        <span class="dot" onclick="setCarousel(2)"></span>
-                    </div>
-                </div>
-
-            </div>
-            
-        </form>
-    </div>
-
-    <div class="footer-nav">
-        <button type="button" class="btn" id="btn-prev" style="display: none;" onclick="changeStep(-1)"><i class="fas fa-chevron-left"></i> Anterior</button>
-        <button type="button" class="btn btn-primary" id="btn-next" onclick="changeStep(1)">Siguiente <i class="fas fa-chevron-right"></i></button>
-    </div>
+<div class="bottom-footer">
+    <div class="footer-brand">YACHAY TECH</div>
+    <div>© 2026 Yachay Tech — Todos los derechos reservados</div>
 </div>
 
 <div class="modal-overlay" id="customModal">
@@ -242,94 +347,9 @@
 
 <script th:inline="javascript">
     let currentStep = 1;
-    const totalSteps = 2; 
-
-    let isAnimating = false;
-
-    function moveCarousel(direction) {
-        if (isAnimating) return;
-        const slide = document.getElementById('productCarousel');
-        isAnimating = true;
-
-        if (direction === 1) {
-            slide.style.transition = 'transform 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1)';
-            slide.style.transform = 'translateX(-100%)';
-            
-            setTimeout(() => {
-                slide.style.transition = 'none';
-                slide.appendChild(slide.firstElementChild);
-                slide.style.transform = 'translateX(0)';
-                updateDots();
-                isAnimating = false;
-            }, 500);
-
-        } else {
-            slide.style.transition = 'none';
-            slide.prepend(slide.lastElementChild);
-            slide.style.transform = 'translateX(-100%)';
-            
-            void slide.offsetWidth; 
-            
-            slide.style.transition = 'transform 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1)';
-            slide.style.transform = 'translateX(0)';
-            
-            setTimeout(() => {
-                updateDots();
-                isAnimating = false;
-            }, 500);
-        }
-    }
-
-    function setCarousel(targetIndex) {
-        if (isAnimating) return;
-        const slide = document.getElementById('productCarousel');
-        let currentIndex = parseInt(slide.firstElementChild.getAttribute('data-index'));
-        
-        if (targetIndex === currentIndex) return;
-        
-        isAnimating = true;
-        slide.style.transition = 'opacity 0.3s ease';
-        slide.style.opacity = 0;
-        
-        setTimeout(() => {
-            slide.style.transition = 'none';
-            while(parseInt(slide.firstElementChild.getAttribute('data-index')) !== targetIndex) {
-                slide.appendChild(slide.firstElementChild);
-            }
-            slide.style.transform = 'translateX(0)';
-            updateDots();
-            
-            void slide.offsetWidth;
-            slide.style.transition = 'opacity 0.3s ease';
-            slide.style.opacity = 1;
-            
-            setTimeout(() => {
-                slide.style.transition = 'none'; 
-                isAnimating = false;
-            }, 300);
-        }, 300);
-    }
-
-    function updateDots() {
-        const slide = document.getElementById('productCarousel');
-        if (!slide) return;
-        const activeIndex = parseInt(slide.firstElementChild.getAttribute('data-index'));
-        const dots = document.querySelectorAll('.carousel-dots .dot');
-        dots.forEach((d, index) => {
-            if (index === activeIndex) {
-                d.classList.add('active');
-            } else {
-                d.classList.remove('active');
-            }
-        });
-    }
-
-    setInterval(() => {
-        if (currentStep === 2 && !isAnimating) {
-            moveCarousel(1);
-        }
-    }, 4000);
-
+    
+    const numPreguntas = /*[[${preguntas != null ? preguntas.size() : 0}]]*/ 0;
+    const totalSteps = numPreguntas > 0 ? 4 + numPreguntas : 5; 
 
     function showModal(message, type = 'warning') {
         const modal = document.getElementById('customModal');
@@ -352,8 +372,23 @@
         modal.classList.add('active');
     }
 
-    function closeModal() {
-        document.getElementById('customModal').classList.remove('active');
+    function isStepAnswered(stepNumber) {
+        const stepDiv = document.getElementById(`step-${stepNumber}`);
+        if (!stepDiv) return true;
+
+        const radios = stepDiv.querySelectorAll('input[type="radio"]');
+        if (radios.length === 0) return true; 
+
+        return Array.from(radios).some(radio => radio.checked);
+    }
+
+    function getFirstUnansweredStep() {
+        for (let i = 5; i <= totalSteps; i++) {
+            if (!isStepAnswered(i)) {
+                return i;
+            }
+        }
+        return totalSteps;
     }
 
     function updateUI() {
@@ -386,9 +421,19 @@
         }
 
         if (currentStep === totalSteps) {
-            btnNext.innerHTML = 'Finalizar <i class="fas fa-check"></i>';
+            btnNext.innerHTML = 'Finalizar Simulación <i class="fas fa-check"></i>';
             btnNext.onclick = function() {
-                showModal("¡Gracias por explorar nuestro catálogo!", "success");
+                const form = document.getElementById('surveyForm');
+                if(!isStepAnswered(currentStep)) {
+                    showModal("Por favor, responde la última pregunta antes de finalizar.", "warning");
+                } else if(!form.checkValidity()) {
+                    showModal("Aún faltan preguntas por responder.", "warning");
+                    currentStep = getFirstUnansweredStep();
+                    updateUI();
+                } else {
+                    showModal("¡Tus decisiones han sido registradas correctamente!", "success");
+                    // setTimeout(() => form.submit(), 1500); 
+                }
             };
         } else {
             btnNext.innerHTML = 'Siguiente <i class="fas fa-chevron-right"></i>';
@@ -397,6 +442,11 @@
     }
 
     function changeStep(direction) {
+        if (direction > 0 && !isStepAnswered(currentStep)) {
+            showModal("Debes seleccionar una opción para continuar a la siguiente etapa.", "warning");
+            return;
+        }
+
         let newStep = currentStep + direction;
         if (newStep < 1) newStep = 1;
         if (newStep > totalSteps) newStep = totalSteps;
@@ -405,6 +455,17 @@
     }
 
     function goToStep(step) {
+        if (step > 4) { 
+            let firstPending = getFirstUnansweredStep();
+            
+            if (step > firstPending) {
+                showModal("No puedes saltar pasos. Por favor, responde las preguntas en orden.", "warning");
+                currentStep = firstPending;
+                updateUI();
+                return;
+            }
+        }
+        
         currentStep = step;
         updateUI();
     }
@@ -414,22 +475,29 @@
 
         setTimeout(() => {
             const nombreGuardado = /*[[${welcomeUser}]]*/ null;
-            
             if (nombreGuardado) {
                 showModal(`¡Hola, ${nombreGuardado}! Te damos la bienvenida a nuestra plataforma. Tu opinión es muy valiosa para nosotros.`, 'welcome');
             }
         }, 400);
     });
-	
+    
+    function closeModal() {
+        document.getElementById('customModal').classList.remove('active');
+        const isSuccess = document.getElementById('modalIcon').classList.contains('success');
+        if (isSuccess) {
+            document.getElementById('surveyForm').submit();
+        }
+    }
 	function closeModal() {
-	        document.getElementById('customModal').classList.remove('active');
-	        
-	        const isSuccess = document.getElementById('modalIcon').classList.contains('success');
-	        
-	        if (isSuccess) {
-	            window.location.href = '/logout'; 
-	        }
+	    document.getElementById('customModal').classList.remove('active');
+	    
+	    const isSuccess = document.getElementById('modalIcon').classList.contains('success');
+	    
+	    if (isSuccess) {
+	        window.location.href = '/logout'; 
+	    } else {
 	    }
+	}
 </script>
 </body>
 </html>

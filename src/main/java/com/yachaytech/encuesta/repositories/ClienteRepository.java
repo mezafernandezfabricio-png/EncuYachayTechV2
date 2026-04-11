@@ -1,6 +1,9 @@
 package com.yachaytech.encuesta.repositories;
 
 import com.yachaytech.encuesta.models.Cliente;
+
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,4 +12,7 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
     Cliente findByCorreo(String correo);
     
     Cliente findByCorreoAndPassword(String correo, String password);
+
+	Optional<Cliente> findById(Integer id);
+    
 }

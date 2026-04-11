@@ -55,19 +55,19 @@
         h2 { font-family: 'Playfair Display', serif; font-size: 36px; margin-bottom: 12px; color: var(--text-primary); font-weight: 600; }
         .dashboard-header p { color: var(--text-secondary); font-size: 15px; }
 
-        .cards-grid { display: flex; justify-content: center; gap: 40px; width: 100%; max-width: 900px; flex-wrap: wrap; }
+        .cards-grid { display: flex; justify-content: center; gap: 30px; width: 100%; max-width: 1100px; flex-wrap: wrap; }
         
-        .admin-card { background: var(--surface-white); border-radius: var(--radius-card); padding: 40px 32px; width: 380px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between; border: 1px solid transparent; transition: var(--transition-base); }
+        .admin-card { background: var(--surface-white); border-radius: var(--radius-card); padding: 40px 32px; width: 320px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between; border: 1px solid transparent; transition: var(--transition-base); }
         .admin-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
         
-        .card-image-container { position: relative; width: 100%; height: 160px; margin-bottom: 24px; display: flex; align-items: center; justify-content: center; }
+        .card-image-container { position: relative; width: 100%; height: 140px; margin-bottom: 24px; display: flex; align-items: center; justify-content: center; }
         .card-image-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
         
-        .image-title { position: absolute; font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 600; color: #1a1a1a; background: rgba(255,255,255,0.85); padding: 5px 20px; border-radius: 8px; backdrop-filter: blur(4px); }
+        .image-title { position: absolute; font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #1a1a1a; background: rgba(255,255,255,0.85); padding: 5px 20px; border-radius: 8px; backdrop-filter: blur(4px); }
 
         .admin-card p { color: var(--text-secondary); font-size: 13.5px; line-height: 1.5; margin-bottom: 30px; padding: 0 10px; }
         
-        .btn-card { background: #A8864F; color: white; border: none; padding: 14px 0; border-radius: 30px; font-weight: 500; font-size: 15px; width: 100%; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; text-decoration: none; transition: var(--transition-base); }
+        .btn-card { background: #A8864F; color: white; border: none; padding: 12px 0; border-radius: 30px; font-weight: 500; font-size: 14px; width: 100%; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; text-decoration: none; transition: var(--transition-base); }
         .admin-card:hover .btn-card { background: var(--accent-gold-dark); }
 
         .bottom-footer { padding: 16px 40px; background: var(--surface-white); border-top: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted); z-index: 30; }
@@ -82,6 +82,8 @@
         .badge-status { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
         .status-FINALIZADO { background: #E8F5E9; color: #2E7D32; }
         .status-EN_PROGRESO { background: #FFF3E0; color: #EF6C00; }
+        .status-ACTIVO { background: #E8F5E9; color: #2E7D32; }
+        .status-PAUSADO { background: #FFEBEE; color: #D32F2F; }
         
         .action-group { display: flex; gap: 10px; }
         .btn-action { background: var(--bg-base); border: 1px solid var(--border-light); padding: 8px 12px; border-radius: 8px; cursor: pointer; color: var(--text-primary); text-decoration: none; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: var(--transition-base); }
@@ -90,6 +92,8 @@
         .btn-download:hover { background: var(--accent-gold-dark); color: white; }
         .btn-edit { color: #1976D2; }
         .btn-delete { color: #D32F2F; }
+        .btn-pause { color: #F57C00; }
+        .btn-play { color: #388E3C; }
 
         .crud-toolbar { width: 100%; max-width: 1000px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .btn-primary { background: var(--accent-deep); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: var(--transition-base); }
@@ -98,7 +102,7 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); display: none; align-items: center; justify-content: center; z-index: 999; opacity: 0; transition: opacity 0.3s ease; }
         .modal-overlay.active { display: flex; opacity: 1; }
         
-        .modal-container { background: var(--surface-white); width: 100%; max-width: 600px; border-radius: var(--radius-card); padding: 40px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative; max-height: 85vh; overflow-y: auto; transform: translateY(20px); transition: transform 0.3s ease; }
+        .modal-container { background: var(--surface-white); width: 100%; max-width: 650px; border-radius: var(--radius-card); padding: 40px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative; max-height: 90vh; overflow-y: auto; transform: translateY(20px); transition: transform 0.3s ease; }
         .modal-overlay.active .modal-container { transform: translateY(0); }
         
         .close-modal { position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; background: var(--bg-base); border-radius: 50%; border: 1px solid var(--border-light); font-size: 16px; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; transition: var(--transition-base); }
@@ -111,7 +115,30 @@
         .answer-group h4 { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
         .answer-group p { font-size: 15px; color: var(--text-primary); font-weight: 500; background: var(--bg-base); padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border-light); }
         
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; color: var(--text-primary); }
+        .form-group label i { color: var(--accent-gold); margin-right: 6px; }
+        .form-group input[type="text"], 
+        .form-group input[type="email"], 
+        .form-group input[type="password"], 
+        .form-group input[type="number"],
+        .form-group textarea { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border-light); border-radius: 12px; background-color: #FEFCF8; font-family: 'Inter', sans-serif; font-size: 14px; outline: none; transition: var(--transition-base); }
+        .form-group input:focus, .form-group textarea:focus { border-color: var(--accent-gold); background-color: white; box-shadow: 0 0 0 3px rgba(180, 140, 72, 0.15); }
+        
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        
+        .option-row { display: flex; gap: 15px; align-items: center; margin-bottom: 12px; }
+        .option-row input[type="radio"] { width: auto; transform: scale(1.3); accent-color: var(--accent-gold); cursor: pointer; margin-left: 5px; }
+        .option-row .radio-label { font-size: 14px; font-weight: 600; color: var(--text-secondary); width: 25px; }
+        
     </style>
+    
+    <script th:inline="javascript">
+        const rolUsuario = /*[[${rolActual}]]*/ null;
+        if (!rolUsuario) {
+            window.location.replace('/login'); 
+        }
+    </script>
 </head>
 <body>
 
@@ -138,6 +165,12 @@
             <div class="menu-item" id="menu-mantenimiento" th:if="${rolActual == 'ADMINISTRADOR'}" onclick="cambiarSeccion('mantenimiento')">
                 <i class="fas fa-tools"></i> Mantenimiento
             </div>
+            <div class="menu-item" id="menu-usuarios" th:if="${rolActual == 'ADMINISTRADOR'}" onclick="cambiarSeccion('usuarios')">
+                <i class="fas fa-users"></i> Control Estudiantes
+            </div>
+            <div class="menu-item" id="menu-docentes" th:if="${rolActual == 'ADMINISTRADOR'}" onclick="cambiarSeccion('docentes')">
+                <i class="fas fa-chalkboard-teacher"></i> Control Docentes
+            </div>
             
             <div class="menu-item" id="menu-reportes" th:if="${rolActual == 'DOCENTE'}" onclick="cambiarSeccion('reportes')">
                 <i class="fas fa-chart-pie"></i> Reportes / Alumnos
@@ -146,9 +179,7 @@
         </div>
         
 		<div>
-           
-
-            <a th:href="@{/logout}" class="logout-btn">
+            <a th:href="@{/logout}" class="logout-btn" onclick="sessionStorage.removeItem('seccionActivaYachay');">
                 <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
             </a>
         </div>
@@ -173,6 +204,24 @@
 				    <div class="btn-card">Entrar <i class="fas fa-arrow-right"></i></div>
 				</div>
 
+                <div class="admin-card" th:if="${rolActual == 'ADMINISTRADOR'}" onclick="cambiarSeccion('usuarios')">
+				    <div class="card-image-container">
+				        <img th:src="@{/img/usuarios.png}" src="https://cdn-icons-png.flaticon.com/512/1256/1256650.png" alt="Ilustración Usuarios">
+				        <div class="image-title">Estudiantes</div>
+				    </div>
+				    <p>Gestione el acceso, active o pause cuentas de estudiantes.</p>
+				    <div class="btn-card">Gestionar <i class="fas fa-arrow-right"></i></div>
+				</div>
+
+                <div class="admin-card" th:if="${rolActual == 'ADMINISTRADOR'}" onclick="cambiarSeccion('docentes')">
+				    <div class="card-image-container">
+				        <img th:src="@{/img/docentes.png}" src="https://cdn-icons-png.flaticon.com/512/1945/1945120.png" alt="Ilustración Docentes">
+				        <div class="image-title">Docentes</div>
+				    </div>
+				    <p>Cree accesos para profesores y controle sus permisos en el sistema.</p>
+				    <div class="btn-card">Gestionar <i class="fas fa-arrow-right"></i></div>
+				</div>
+
                 <div class="admin-card" th:if="${rolActual == 'DOCENTE'}" onclick="cambiarSeccion('reportes')">
 				    <div class="card-image-container">
 				        <img th:src="@{/img/repots.jpeg}" src="https://cdn-icons-png.flaticon.com/512/1055/1055685.png" alt="Ilustración Reportes">
@@ -188,50 +237,183 @@
         <div id="sec-mantenimiento" class="content-area" style="display: none;" th:if="${rolActual == 'ADMINISTRADOR'}">
             <div class="dashboard-header">
                 <h2>Mantenimiento de Simulación</h2>
-                <p>Gestione las variables, opciones y puntajes del caso Yachay Tech.</p>
+                <p>Gestione las preguntas, opciones múltiples y puntajes del caso Yachay Tech.</p>
             </div>
 
             <div class="crud-toolbar">
-                <p style="font-size: 14px; color: var(--text-secondary); font-weight: 500;">Opciones Disponibles (Ejemplo de CRUD)</p>
-                <button class="btn-primary" onclick="alert('Lógica para abrir modal de crear opción')">
-                    <i class="fas fa-plus"></i> Nueva Opción
+                <p style="font-size: 14px; color: var(--text-secondary); font-weight: 500;">Banco de Preguntas</p>
+                <button class="btn-primary" onclick="abrirModalMantenimiento('crear')">
+                    <i class="fas fa-plus"></i> Nueva Pregunta
                 </button>
             </div>
 
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th style="width: 50px;">ID</th>
                         <th>Fase</th>
-                        <th>Descripción (Insight)</th>
+                        <th style="width: 45%;">Pregunta (Enunciado)</th>
                         <th>Puntaje</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td style="font-weight: 500;">#01</td>
-                        <td>Estímulos</td>
-                        <td>Prueba de Rendimiento Crítico de Yachay-Hub</td>
-                        <td>+2 pts</td>
+                    <tr th:each="pregunta : ${preguntas}">
+                        <td style="font-weight: 500;" th:text="'#' + ${pregunta.id}">#01</td>
+                        <td th:text="${pregunta.fase}">Estímulos</td>
+                        <td th:text="${pregunta.enunciado}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px;">¿Cuál es tu primera recomendación estratégica...?</td>
+                        <td th:text="${pregunta.puntaje} + ' pts'">+2 pts</td>
                         <td>
                             <div class="action-group">
-                                <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Editar</button>
-                                <button class="btn-action btn-delete"><i class="fas fa-trash-alt"></i></button>
+                                <button class="btn-action btn-edit" 
+                                        type="button"
+                                        th:data-id="${pregunta.id}"
+                                        th:data-fase="${pregunta.fase}"
+                                        th:data-enunciado="${pregunta.enunciado}"
+                                        th:data-opciona="${pregunta.opcionA}"
+                                        th:data-opcionb="${pregunta.opcionB}"
+                                        th:data-opcionc="${pregunta.opcionC}"
+                                        th:data-opciond="${pregunta.opcionD}"
+                                        th:data-correcta="${pregunta.respuestaCorrecta}"
+                                        th:data-puntaje="${pregunta.puntaje}"
+                                        onclick="botonEditarMantenimiento(this)">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <button class="btn-action btn-delete" 
+                                        th:onclick="|abrirModalEliminarMantenimiento(${pregunta.id})|">
+                                    <i class="fas fa-trash-alt"></i> Eliminar
+                                </button>
                             </div>
                         </td>
                     </tr>
+                    <tr th:if="${preguntas == null or preguntas.isEmpty()}">
+                        <td colspan="5" style="text-align: center; color: var(--text-muted);">No hay preguntas de simulación registradas.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="sec-usuarios" class="content-area" style="display: none;" th:if="${rolActual == 'ADMINISTRADOR'}">
+            <div class="dashboard-header">
+                <h2>Control de Estudiantes</h2>
+                <p>Gestione el acceso de las cuentas creadas en la plataforma.</p>
+            </div>
+
+            <div class="crud-toolbar">
+                <p style="font-size: 14px; color: var(--text-secondary); font-weight: 500;">Listado General</p>
+                </div>
+
+            <table class="data-table">
+                <thead>
                     <tr>
-                        <td style="font-weight: 500;">#02</td>
-                        <td>Toma de Decisiones</td>
-                        <td>Encuesta de Referidos y canales</td>
-                        <td>+0.5 pts</td>
+                        <th>Nombre</th>
+                        <th>Correo Cibertec</th>
+                        <th>Estado de Cuenta</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="estudiante : ${estudiantes}">
+                        <td style="font-weight: 500;" th:text="${estudiante.nombre}">Nombre Estudiante</td>
+                        <td th:text="${estudiante.correo}">correo@cibertec.edu.pe</td>
+                        <td>
+                            <span class="badge-status" 
+                                  th:classappend="${estudiante.estado} ? 'status-ACTIVO' : 'status-PAUSADO'"
+                                  th:text="${estudiante.estado} ? 'ACTIVO' : 'PAUSADO'">ACTIVO</span>
+                        </td>
                         <td>
                             <div class="action-group">
-                                <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Editar</button>
-                                <button class="btn-action btn-delete"><i class="fas fa-trash-alt"></i></button>
+                                <button th:if="${estudiante.estado}" class="btn-action btn-pause" 
+                                        th:onclick="'window.location.href=\'/admin/usuario/toggle/' + ${estudiante.id} + '\''">
+                                    <i class="fas fa-pause-circle"></i> Pausar
+                                </button>
+                                
+                                <button th:unless="${estudiante.estado}" class="btn-action btn-play" 
+                                        th:onclick="'window.location.href=\'/admin/usuario/toggle/' + ${estudiante.id} + '\''">
+                                    <i class="fas fa-play-circle"></i> Activar
+                                </button>
                             </div>
                         </td>
+                    </tr>
+                    <tr th:if="${estudiantes == null or estudiantes.isEmpty()}">
+                        <td colspan="4" style="text-align: center; color: var(--text-muted);">No hay estudiantes registrados.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="sec-docentes" class="content-area" style="display: none;" th:if="${rolActual == 'ADMINISTRADOR'}">
+            <div class="dashboard-header">
+                <h2>Control de Docentes</h2>
+                <p>Cree accesos y gestione los permisos de los profesores.</p>
+            </div>
+
+            <div th:if="${errorAdmin != null}" style="background: #FFEBEE; color: #D32F2F; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; width: 100%; max-width: 1000px; text-align: center; font-weight: 500; border: 1px solid #FFCDD2;">
+                <i class="fas fa-exclamation-triangle"></i> <span th:text="${errorAdmin}">Error</span>
+            </div>
+            <div th:if="${successAdmin != null}" style="background: #E8F5E9; color: #2E7D32; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; width: 100%; max-width: 1000px; text-align: center; font-weight: 500; border: 1px solid #C8E6C9;">
+                <i class="fas fa-check-circle"></i> <span th:text="${successAdmin}">Éxito</span>
+            </div>
+            
+            <script th:if="${errorAdmin != null or successAdmin != null}">
+                document.addEventListener("DOMContentLoaded", function() {
+                    cambiarSeccion('docentes');
+                });
+            </script>
+            <div class="crud-toolbar">
+                <p style="font-size: 14px; color: var(--text-secondary); font-weight: 500;">Listado Docente</p>
+                <button class="btn-primary" onclick="abrirModalCrearDocente()">
+                    <i class="fas fa-user-plus"></i> Crear Nuevo Docente
+                </button>
+            </div>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Nombre Docente</th>
+                        <th>Correo Institucional</th>
+                        <th>Estado de Cuenta</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="docente : ${docentes}">
+                        <td style="font-weight: 500;" th:text="${docente.nombre}">Nombre Docente</td>
+                        <td th:text="${docente.correo}">correo@yachaytech.com</td>
+                        <td>
+                            <span class="badge-status" 
+                                  th:classappend="${docente.estado} ? 'status-ACTIVO' : 'status-PAUSADO'"
+                                  th:text="${docente.estado} ? 'ACTIVO' : 'PAUSADO'">ACTIVO</span>
+                        </td>
+                        <td>
+                            <div class="action-group">
+								<button class="btn-action btn-edit" 
+								        type="button"
+								        th:data-id="${docente.id}"
+								        th:data-nombre="${docente.nombre}"
+								        th:data-correo="${docente.correo}"
+								        onclick="botonEditarPresionado(this)">
+								    <i class="fas fa-edit"></i> Editar
+								</button>
+                                
+                                <button th:if="${docente.estado}" class="btn-action btn-pause" 
+                                        th:onclick="'window.location.href=\'/admin/docente/toggle/' + ${docente.id} + '\''">
+                                    <i class="fas fa-pause-circle"></i> Pausar
+                                </button>
+                                
+                                <button th:unless="${docente.estado}" class="btn-action btn-play" 
+                                        th:onclick="'window.location.href=\'/admin/docente/toggle/' + ${docente.id} + '\''">
+                                    <i class="fas fa-play-circle"></i> Activar
+                                </button>
+								<button class="btn-action btn-delete" 
+								                                th:onclick="|abrirModalEliminar(${docente.id})|">
+								                            <i class="fas fa-trash-alt"></i> Eliminar
+								                        </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${docentes == null or docentes.isEmpty()}">
+                        <td colspan="4" style="text-align: center; color: var(--text-muted);">No hay docentes registrados.</td>
                     </tr>
                 </tbody>
             </table>
@@ -297,7 +479,7 @@
 
 <div class="bottom-footer">
     <div class="footer-brand">YACHAY TECH</div>
-    <div>© 2025 Yachay Tech — Todos los derechos reservados</div>
+    <div>© 2026 Yachay Tech — Todos los derechos reservados</div>
 </div>
 
 <div style="display:none;" id="datos-ocultos-simulaciones">
@@ -330,9 +512,146 @@
     </div>
 </div>
 
+<div class="modal-overlay" id="modalDocente">
+    <div class="modal-container" style="max-width: 500px;">
+        <button class="close-modal" onclick="cerrarModalDocente()"><i class="fas fa-times"></i></button>
+        <div class="modal-header">
+            <h3 id="modalDocenteTitulo">Docente</h3>
+            <p id="modalDocenteSubtitulo">Complete los datos para continuar.</p>
+        </div>
+        
+        <form id="formDocente" method="post" style="margin-top: 20px;">
+            <input type="hidden" id="docenteId" name="id">
+            
+            <div class="form-group">
+                <label for="nombreDocente"><i class="fas fa-user"></i> Nombre Completo</label>
+                <input type="text" id="nombreDocente" name="nombre" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="correoDocente"><i class="fas fa-envelope"></i> Correo Institucional</label>
+                <input type="email" id="correoDocente" name="correo" required>
+            </div>
+
+            <div class="form-group">
+                <label for="passwordDocente" id="lblPasswordDocente"><i class="fas fa-key"></i> Contraseña</label>
+                <input type="password" id="passwordDocente" name="password">
+                <small id="passwordHelpText" style="display:none; color: #8A8A8A; margin-top: 5px; display: block;">Deje en blanco para mantener la actual.</small>
+            </div>
+            
+            <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 14px;">
+                <i class="fas fa-save"></i> <span id="btnTextDocente">Guardar</span>
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalEliminar">
+    <div class="modal-container" style="max-width: 400px; text-align: center;">
+        <button class="close-modal" onclick="cerrarModalEliminar()"><i class="fas fa-times"></i></button>
+        <div class="modal-header" style="border-bottom: none; padding-bottom: 0;">
+            <div style="font-size: 40px; color: #D32F2F; margin-bottom: 15px;"><i class="fas fa-exclamation-circle"></i></div>
+            <h3 style="margin-bottom: 10px;">Confirmar Eliminación</h3>
+            <p style="border-bottom: none;">¿Estás seguro de que deseas eliminar este docente? Esta acción no se puede deshacer.</p>
+        </div>
+        
+        <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
+            <button class="btn-action" style="padding: 10px 20px;" type="button" onclick="cerrarModalEliminar()">Cancelar</button>
+            <a href="#" id="btnConfirmarEliminar" class="btn-primary" style="background-color: #D32F2F; padding: 10px 20px;">
+                <i class="fas fa-trash-alt"></i> Eliminar
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalMantenimiento">
+    <div class="modal-container" style="max-width: 700px;">
+        <button class="close-modal" onclick="cerrarModalMantenimiento()"><i class="fas fa-times"></i></button>
+        <div class="modal-header">
+            <h3 id="modalMantenimientoTitulo">Pregunta de Simulación</h3>
+            <p id="modalMantenimientoSubtitulo">Redacta el enunciado, las opciones y marca la respuesta correcta.</p>
+        </div>
+        
+        <form id="formMantenimiento" method="post" style="margin-top: 20px;">
+            <input type="hidden" id="mantenimientoId" name="id">
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label for="fasePregunta"><i class="fas fa-layer-group"></i> Fase del Simulador</label>
+                    <input type="text" id="fasePregunta" name="fase" placeholder="Ej. Regreso a clases" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="puntajePregunta"><i class="fas fa-star"></i> Puntaje de la Pregunta</label>
+                    <input type="number" step="0.5" id="puntajePregunta" name="puntaje" placeholder="Ej. 2" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="enunciadoPregunta"><i class="fas fa-align-left"></i> Enunciado de la Pregunta</label>
+                <textarea id="enunciadoPregunta" name="enunciado" placeholder="Escribe la situación y la pregunta aquí..." required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-list-ul"></i> Opciones de Respuesta</label>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Escribe las 4 opciones y selecciona el círculo de la respuesta que será correcta.</p>
+
+                <div class="option-row">
+                    <input type="radio" name="respuestaCorrecta" value="A" id="correctaA" required title="Marcar como correcta">
+                    <span class="radio-label">A)</span>
+                    <input type="text" id="opcionA" name="opcionA" placeholder="Opción A..." required>
+                </div>
+                
+                <div class="option-row">
+                    <input type="radio" name="respuestaCorrecta" value="B" id="correctaB" required title="Marcar como correcta">
+                    <span class="radio-label">B)</span>
+                    <input type="text" id="opcionB" name="opcionB" placeholder="Opción B..." required>
+                </div>
+
+                <div class="option-row">
+                    <input type="radio" name="respuestaCorrecta" value="C" id="correctaC" required title="Marcar como correcta">
+                    <span class="radio-label">C)</span>
+                    <input type="text" id="opcionC" name="opcionC" placeholder="Opción C..." required>
+                </div>
+
+                <div class="option-row">
+                    <input type="radio" name="respuestaCorrecta" value="D" id="correctaD" required title="Marcar como correcta">
+                    <span class="radio-label">D)</span>
+                    <input type="text" id="opcionD" name="opcionD" placeholder="Opción D..." required>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 14px; margin-top: 10px;">
+                <i class="fas fa-save"></i> <span id="btnTextMantenimiento">Guardar Pregunta</span>
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalEliminarMantenimiento">
+    <div class="modal-container" style="max-width: 400px; text-align: center;">
+        <button class="close-modal" onclick="cerrarModalEliminarMantenimiento()"><i class="fas fa-times"></i></button>
+        <div class="modal-header" style="border-bottom: none; padding-bottom: 0;">
+            <div style="font-size: 40px; color: #D32F2F; margin-bottom: 15px;"><i class="fas fa-exclamation-circle"></i></div>
+            <h3 style="margin-bottom: 10px;">Confirmar Eliminación</h3>
+            <p style="border-bottom: none;">¿Estás seguro de que deseas eliminar esta pregunta? Esta acción no se puede deshacer.</p>
+        </div>
+        
+        <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
+            <button class="btn-action" style="padding: 10px 20px;" type="button" onclick="cerrarModalEliminarMantenimiento()">Cancelar</button>
+            <a href="#" id="btnConfirmarEliminarMantenimiento" class="btn-primary" style="background-color: #D32F2F; padding: 10px 20px;">
+                <i class="fas fa-trash-alt"></i> Eliminar
+            </a>
+        </div>
+    </div>
+</div>
+
 <script>
     let tiempoInactividad;
-    function cerrarSesionPorInactividad() { window.location.href = '/logout'; }
+    function cerrarSesionPorInactividad() { 
+        sessionStorage.removeItem('seccionActivaYachay');
+        window.location.href = '/logout'; 
+    }
     function reiniciarTemporizador() {
         clearTimeout(tiempoInactividad);
         tiempoInactividad = setTimeout(cerrarSesionPorInactividad, 180000); 
@@ -345,43 +664,44 @@
     document.onscroll = reiniciarTemporizador;
 
     function cambiarSeccion(seccion) {
-        document.getElementById('menu-inicio').classList.remove('active');
+        const secciones = ['inicio', 'mantenimiento', 'usuarios', 'docentes', 'reportes'];
         
-        let menuReportes = document.getElementById('menu-reportes');
-        if(menuReportes) menuReportes.classList.remove('active');
-        
-        let menuMante = document.getElementById('menu-mantenimiento');
-        if(menuMante) menuMante.classList.remove('active');
+        secciones.forEach(s => {
+            const menu = document.getElementById('menu-' + s);
+            const content = document.getElementById('sec-' + s);
+            
+            if (menu) menu.classList.remove('active');
+            if (content) content.style.display = 'none';
+        });
 
-        document.getElementById('sec-inicio').style.display = 'none';
+        const menuActivo = document.getElementById('menu-' + seccion);
+        const contentActivo = document.getElementById('sec-' + seccion);
         
-        let secReportes = document.getElementById('sec-reportes');
-        if(secReportes) secReportes.style.display = 'none';
-        
-        let secMante = document.getElementById('sec-mantenimiento');
-        if(secMante) secMante.style.display = 'none';
-
-        if(seccion === 'inicio') {
-            document.getElementById('menu-inicio').classList.add('active');
-            document.getElementById('sec-inicio').style.display = 'flex';
-        } else if (seccion === 'reportes' && secReportes) {
-            menuReportes.classList.add('active');
-            secReportes.style.display = 'flex';
-        } else if (seccion === 'mantenimiento' && secMante) {
-            menuMante.classList.add('active');
-            secMante.style.display = 'flex';
+        if (menuActivo) menuActivo.classList.add('active');
+        if (contentActivo) {
+            contentActivo.style.display = (seccion === 'inicio') ? 'flex' : 'flex';
+            contentActivo.style.flexDirection = 'column';
         }
+        
+        sessionStorage.setItem('seccionActivaYachay', seccion);
     }
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        const seccionGuardada = sessionStorage.getItem('seccionActivaYachay');
+        if (seccionGuardada) {
+            cambiarSeccion(seccionGuardada);
+        } else {
+            cambiarSeccion('inicio'); 
+        }
+    });
 
     function abrirModal(simId) {
         let dataElement = document.getElementById('data-sim-' + simId);
-        
         if(dataElement) {
             document.getElementById('modal-body-content').innerHTML = dataElement.innerHTML;
         } else {
-            document.getElementById('modal-body-content').innerHTML = "<p>No se encontraron datos detallados para este registro.</p>";
+            document.getElementById('modal-body-content').innerHTML = "<p>No se encontraron datos detallados.</p>";
         }
-        
         document.getElementById('modalDetalle').classList.add('active');
     }
 
@@ -389,11 +709,142 @@
         document.getElementById('modalDetalle').classList.remove('active');
     }
 
-    document.getElementById('modalDetalle').addEventListener('click', function(e) {
-        if(e.target === this) {
-            cerrarModal();
+    function botonEditarPresionado(btn) {
+        const id = btn.getAttribute('data-id');
+        const nombre = btn.getAttribute('data-nombre');
+        const correo = btn.getAttribute('data-correo');
+        abrirModalDocente('editar', id, nombre, correo);
+    }
+
+    function abrirModalDocente(modo, id = null, nombre = '', correo = '') {
+        const form = document.getElementById('formDocente');
+        const titulo = document.getElementById('modalDocenteTitulo');
+        const btnText = document.getElementById('btnTextDocente');
+        const helpPass = document.getElementById('passwordHelpText');
+        const inputPass = document.getElementById('passwordDocente');
+
+        document.getElementById('docenteId').value = id || '';
+        document.getElementById('nombreDocente').value = nombre;
+        document.getElementById('correoDocente').value = correo;
+        inputPass.value = ''; 
+
+        if (modo === 'crear') {
+            titulo.innerText = "Crear Nuevo Docente";
+            btnText.innerText = "Guardar Docente";
+            form.action = "/admin/crearDocente";
+            inputPass.required = true;
+            helpPass.style.display = 'none';
+        } else {
+            titulo.innerText = "Editar Docente";
+            btnText.innerText = "Actualizar Docente";
+            form.action = "/admin/editarDocente";
+            inputPass.required = false; 
+            helpPass.style.display = 'block';
         }
-    });
+        document.getElementById('modalDocente').classList.add('active');
+    }
+
+    function cerrarModalDocente() {
+        document.getElementById('modalDocente').classList.remove('active');
+    }
+
+    function abrirModalCrearDocente() {
+        abrirModalDocente('crear');
+    }
+
+    function abrirModalEliminar(id) {
+        const btnConfirmar = document.getElementById('btnConfirmarEliminar');
+        if (btnConfirmar) {
+            btnConfirmar.href = '/admin/docente/eliminar/' + id;
+            document.getElementById('modalEliminar').classList.add('active');
+        }
+    }
+
+    function cerrarModalEliminar() {
+        document.getElementById('modalEliminar').classList.remove('active');
+    }
+
+    function botonEditarMantenimiento(btn) {
+        const id = btn.getAttribute('data-id');
+        const fase = btn.getAttribute('data-fase');
+        const enunciado = btn.getAttribute('data-enunciado');
+        const opA = btn.getAttribute('data-opciona');
+        const opB = btn.getAttribute('data-opcionb');
+        const opC = btn.getAttribute('data-opcionc');
+        const opD = btn.getAttribute('data-opciond');
+        const correcta = btn.getAttribute('data-correcta'); 
+        const puntaje = btn.getAttribute('data-puntaje');
+        
+        abrirModalMantenimiento('editar', id, fase, enunciado, opA, opB, opC, opD, correcta, puntaje);
+    }
+
+    function abrirModalMantenimiento(modo, id = null, fase = '', enunciado = '', opA = '', opB = '', opC = '', opD = '', correcta = '', puntaje = '') {
+        const form = document.getElementById('formMantenimiento');
+        const titulo = document.getElementById('modalMantenimientoTitulo');
+        const btnText = document.getElementById('btnTextMantenimiento');
+
+        document.getElementById('mantenimientoId').value = id || '';
+        document.getElementById('fasePregunta').value = fase;
+        document.getElementById('enunciadoPregunta').value = enunciado;
+        document.getElementById('opcionA').value = opA;
+        document.getElementById('opcionB').value = opB;
+        document.getElementById('opcionC').value = opC;
+        document.getElementById('opcionD').value = opD;
+        document.getElementById('puntajePregunta').value = puntaje;
+        
+        document.getElementById('correctaA').checked = false;
+        document.getElementById('correctaB').checked = false;
+        document.getElementById('correctaC').checked = false;
+        document.getElementById('correctaD').checked = false;
+
+        if (correcta) {
+            const radioCorrecto = document.getElementById('correcta' + correcta);
+            if(radioCorrecto) radioCorrecto.checked = true;
+        }
+
+        if (modo === 'crear') {
+            titulo.innerText = "Crear Nueva Pregunta";
+            btnText.innerText = "Guardar Pregunta";
+            form.action = "/admin/mantenimiento/crear"; 
+        } else {
+            titulo.innerText = "Editar Pregunta";
+            btnText.innerText = "Actualizar Pregunta";
+            form.action = "/admin/mantenimiento/editar"; 
+        }
+        document.getElementById('modalMantenimiento').classList.add('active');
+    }
+
+    function cerrarModalMantenimiento() {
+        document.getElementById('modalMantenimiento').classList.remove('active');
+    }
+
+    function abrirModalEliminarMantenimiento(id) {
+        const btnConfirmar = document.getElementById('btnConfirmarEliminarMantenimiento');
+        if (btnConfirmar) {
+            btnConfirmar.href = '/admin/mantenimiento/eliminar/' + id; 
+            document.getElementById('modalEliminarMantenimiento').classList.add('active');
+        }
+    }
+
+    function cerrarModalEliminarMantenimiento() {
+        document.getElementById('modalEliminarMantenimiento').classList.remove('active');
+    }
+
+    window.onclick = function(event) {
+        const modales = [
+            document.getElementById('modalDetalle'),
+            document.getElementById('modalDocente'),
+            document.getElementById('modalEliminar'),
+            document.getElementById('modalMantenimiento'),
+            document.getElementById('modalEliminarMantenimiento')
+        ];
+        
+        modales.forEach(m => {
+            if (event.target === m) {
+                m.classList.remove('active');
+            }
+        });
+    }
 </script>
 </body>
 </html>
