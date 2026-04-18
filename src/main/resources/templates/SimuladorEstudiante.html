@@ -496,29 +496,29 @@
 	                </div>
 	
 	                <div class="step-container" id="step-7">
-	                    <h2>Resultados Obtenidos</h2>
-	                    <p style="text-align: center; color: var(--text-secondary); margin-bottom: 10px;">Analiza cuidadosamente los hallazgos de tu investigación.</p>
+	                    <h2>Feedback y Resultados</h2>
+	                    <p style="text-align: center; color: var(--text-secondary); margin-bottom: 10px;">Revisa el feedback del simulador y analiza los resultados obtenidos con el instrumento seleccionado.</p>
 	                    
 	                    <div class="flip-card" onclick="this.classList.toggle('is-flipped')">
 	                        <div class="flip-card-inner">
 	                            <div class="flip-card-front">
-	                                <div class="fc-title"><i class="fas fa-comment-dots" style="color: var(--accent-gold); margin-right: 8px;"></i> Feedback del Simulador:</div>
+	                                <div class="fc-title"><i class="fas fa-comment-dots" style="color: var(--accent-gold); margin-right: 8px;"></i> Feedback:</div>
 	                                <div class="fc-content" id="res-feedback"></div>
-	                                <div class="click-hint"><i class="fas fa-sync-alt"></i> Haz clic en la tarjeta para ver los hallazgos reales</div>
+	                                <div class="click-hint"><i class="fas fa-sync-alt"></i>Haz clic en la tarjeta para ver los resultados</div>
 	                            </div>
 	                            <div class="flip-card-back">
-	                                <div class="fc-title"><i class="fas fa-search-chart" style="color: var(--accent-deep); margin-right: 8px;"></i> Hallazgos del Instrumento:</div>
+	                                <div class="fc-title" id="res-title"></div>
 	                                <div class="fc-content" id="res-data"></div>
 	                                <div class="click-hint" style="background: rgba(44, 62, 47, 0.08); color: var(--accent-deep);"><i class="fas fa-undo"></i> Haz clic para volver al feedback</div>
 	                            </div>
 	                        </div>
 	                    </div>
 	
-	                    <div class="dynamic-nav" id="dynamic-nav-buttons"></div>
+	                    <div class="dynamic-nav" id="dynamic-nav-buttons" style=" margin-top: 5px;"></div>
 	                </div>
 	
 	                <div class="step-container" id="step-8">
-	                    <h2>2da FASE: Identificación del Buyer Persona</h2>
+	                    <h2>SEGUNDA FASE: Identificación del Buyer Persona</h2>
 	                    
 	                    <div style="background: var(--surface-white); padding: 24px 32px; border-radius: 16px; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-deep); margin-bottom: 32px; box-shadow: var(--shadow-sm);">
 	                        <h3 style="font-size: 1.1rem; color: var(--accent-deep); margin-bottom: 12px;">RESUMEN DE LOS RESULTADOS OBTENIDOS:</h3>
@@ -916,7 +916,8 @@
         
         document.getElementById('res-feedback').innerText = instrument.feedback;
         document.getElementById('res-data').innerText = instrument.result;
-        
+		document.getElementById('res-title').innerHTML =
+		    `<i class="fas fa-chart-line" style="color: var(--accent-deep); margin-right: 8px;"></i>Resultados: ${instrument.name}`;
         document.querySelector('#step-7 .flip-card').classList.remove('is-flipped');
 
         if (!completedAnalyses.includes(analysisId)) {
@@ -935,7 +936,7 @@
         navContainer.innerHTML = ''; 
         
         if (completedAnalyses.length === 3) {
-            navContainer.innerHTML = `<button type="button" class="btn btn-primary" onclick="goToStep(5)" style="padding: 14px 32px; font-size: 1.1rem;">Ver Resumen de Fase 1 <i class="fas fa-arrow-right"></i></button>`;
+            navContainer.innerHTML = `<button type="button" class="btn btn-primary" onclick="goToStep(5)" style="padding: 14px 32px; font-size: 1.1rem;">Continuar<i class="fas fa-arrow-right"></i></button>`;
         } else {
             let html = '';
             if (!completedAnalyses.includes('A')) html += `<button type="button" class="btn btn-outline" onclick="openAnalysis('A')"><i class="fas fa-bullhorn"></i> Ir a Análisis de Estímulos</button>`;
@@ -993,7 +994,7 @@
         
         if (completedProfiles.length === 2) {
             document.getElementById('prof-action-text').innerText = "Has definido a ambos Buyer Personas exitosamente.";
-            navContainer.innerHTML = `<button type="button" class="btn btn-primary" onclick="goToStep(8)" style="padding: 14px 32px; font-size: 1.1rem;">Ver Resumen de Fase 2 <i class="fas fa-arrow-right"></i></button>`;
+            navContainer.innerHTML = `<button type="button" class="btn btn-primary" onclick="goToStep(8)" style="padding: 14px 32px; font-size: 1.1rem;">Continuar<i class="fas fa-arrow-right"></i></button>`;
         } else {
             document.getElementById('prof-action-text').innerText = "Ahora, debes definir el perfil del Buyer Persona restante.";
             let otherId = profileId === 'Hijo' ? 'Padre' : 'Hijo';
