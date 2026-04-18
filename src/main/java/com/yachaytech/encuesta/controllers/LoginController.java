@@ -1,11 +1,9 @@
 package com.yachaytech.encuesta.controllers;
 
 import com.yachaytech.encuesta.models.Administrador;
-import com.yachaytech.encuesta.models.Cliente;
-import com.yachaytech.encuesta.models.Pregunta;
+import com.yachaytech.encuesta.models.Estudiante;
 import com.yachaytech.encuesta.repositories.AdministradorRepository;
-import com.yachaytech.encuesta.repositories.ClienteRepository;
-import com.yachaytech.encuesta.repositories.PreguntaRepository;
+import com.yachaytech.encuesta.repositories.EstudianteRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,13 +21,10 @@ import java.util.List;
 public class LoginController {
 
     @Autowired
-    private ClienteRepository clienteRepository;
+    private EstudianteRepository estudianteRepository;
 
     @Autowired
     private AdministradorRepository adminRepository;
-
-    @Autowired
-    private PreguntaRepository preguntaRepository;
 
     private static final List<String> PALABRAS_OFENSIVAS = Arrays.asList(
             "puta", "puto", "mierda", "cabron", "cabròn", "pendejo", 
@@ -40,24 +35,29 @@ public class LoginController {
     @GetMapping("/")
     public String mostrarLogin(HttpSession session, Model model) {
         if (session.getAttribute("adminLogueado") != null) {
-            return "redirect:/admin/panel";
+            String rol = (String) session.getAttribute("rolAdmin");
+            if ("ADMINISTRADOR".equals(rol)) {
+                return "redirect:/admin/panel";
+            } else if ("DOCENTE".equals(rol)) {
+                return "redirect:/docente/panel";
+            }
         }
-        if (session.getAttribute("clienteId") != null) {
-            return "redirect:/encuesta";
+        if (session.getAttribute("estudianteId") != null) {
+            return "redirect:/simulador";
         }
         return "Login";
     }
     
-    @PostMapping("/loginCliente")
-    public String loginCliente(@RequestParam("correo") String correo,
-                               @RequestParam("passwordCliente") String passwordCliente,
+    @PostMapping("/loginEstudiante")
+    public String loginEstudiante(@RequestParam("correo") String correo,
+                               @RequestParam("passwordEstudiante") String passwordEstudiante,
                                HttpSession session,
                                RedirectAttributes redirectAttributes,
                                Model model) {
         
-        if (correo == null || correo.trim().isEmpty() || passwordCliente == null || passwordCliente.trim().isEmpty()) {
+        if (correo == null || correo.trim().isEmpty() || passwordEstudiante == null || passwordEstudiante.trim().isEmpty()) {
             model.addAttribute("error", "El correo y la contraseña son obligatorios.");
-            model.addAttribute("tipoError", "clienteLogin");
+            model.addAttribute("tipoError", "estudianteLogin");
             if (correo != null && !correo.trim().isEmpty()) {
                 model.addAttribute("correoIngresado", correo); 
             }
@@ -66,92 +66,92 @@ public class LoginController {
 
         if (!correo.trim().matches("^i\\d{9}@cibertec\\.edu\\.pe$")) {
             model.addAttribute("error", "El correo debe tener el formato i202409426@cibertec.edu.pe");
-            model.addAttribute("tipoError", "clienteLogin");
+            model.addAttribute("tipoError", "estudianteLogin");
             return "Login";
         }
 
-        Cliente cliente = clienteRepository.findByCorreoAndPassword(correo.trim(), passwordCliente.trim());
+        Estudiante estudiante = estudianteRepository.findByCorreoAndPassword(correo.trim(), passwordEstudiante.trim());
         
-        if (cliente != null) {
-            if (cliente.getEstado() != null && !cliente.getEstado()) {
+        if (estudiante != null) {
+            if (estudiante.getEstado() != null && !estudiante.getEstado()) {
                 model.addAttribute("error", "Tu cuenta ha sido pausada por un administrador.");
-                model.addAttribute("tipoError", "clienteLogin");
+                model.addAttribute("tipoError", "estudianteLogin");
                 model.addAttribute("correoIngresado", correo); 
                 return "Login";
             }
             
-            session.setAttribute("clienteId", cliente.getId());
-            session.setAttribute("clienteNombre", cliente.getNombre());
+            session.setAttribute("estudianteId", estudiante.getId());
+            session.setAttribute("estudianteNombre", estudiante.getNombre());
             session.setMaxInactiveInterval(1800); 
-            redirectAttributes.addFlashAttribute("welcomeUser", cliente.getNombre());
-            return "redirect:/encuesta";
+            redirectAttributes.addFlashAttribute("welcomeUser", estudiante.getNombre());
+            return "redirect:/simulador";
         } else {
             model.addAttribute("error", "Credenciales incorrectas o la cuenta no existe.");
-            model.addAttribute("tipoError", "clienteLogin");
+            model.addAttribute("tipoError", "estudianteLogin");
             model.addAttribute("correoIngresado", correo); 
             return "Login";
         }
     }
 
-    @PostMapping("/registroCliente")
-    public String registroCliente(@RequestParam("correo") String correo,
-                                  @RequestParam("passwordCliente") String passwordCliente,
+    @PostMapping("/registroEstudiante")
+    public String registroEstudiante(@RequestParam("correo") String correo,
+                                  @RequestParam("passwordEstudiante") String passwordEstudiante,
                                   @RequestParam(value = "curso", required = false) String curso,
                                   RedirectAttributes redirectAttributes,
                                   Model model) {
         
         if (correo == null || correo.trim().isEmpty()) {
             model.addAttribute("error", "El correo institucional es obligatorio.");
-            model.addAttribute("tipoError", "clienteRegistro");
+            model.addAttribute("tipoError", "estudianteRegistro");
             return "Login";
         }
 
         if (!correo.trim().matches("^i\\d{9}@cibertec\\.edu\\.pe$")) {
             model.addAttribute("error", "El correo debe tener el formato i202409426@cibertec.edu.pe");
-            model.addAttribute("tipoError", "clienteRegistro");
+            model.addAttribute("tipoError", "estudianteRegistro");
             return "Login"; 
         }
 
-        Cliente existente = clienteRepository.findByCorreo(correo.trim());
+        Estudiante existente = estudianteRepository.findByCorreo(correo.trim());
         if (existente != null) {
             model.addAttribute("error", "Ya existe una cuenta con este correo institucional.");
-            model.addAttribute("tipoError", "clienteRegistro");
+            model.addAttribute("tipoError", "estudianteRegistro");
             return "Login"; 
         }
 
-        if (passwordCliente == null || passwordCliente.trim().isEmpty()) {
+        if (passwordEstudiante == null || passwordEstudiante.trim().isEmpty()) {
             model.addAttribute("error", "La contraseña es obligatoria.");
-            model.addAttribute("tipoError", "clienteRegistro");
+            model.addAttribute("tipoError", "estudianteRegistro");
             model.addAttribute("correoIngresado", correo); 
             return "Login";
         }
         
         String regexSeguridad = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$";
-        if (!passwordCliente.matches(regexSeguridad)) {
+        if (!passwordEstudiante.matches(regexSeguridad)) {
             model.addAttribute("error", "La contraseña debe tener más seguridad (Mayúscula, minúscula, caracter especial, minimo 8 caracteres)");
-            model.addAttribute("tipoError", "clienteRegistro");
+            model.addAttribute("tipoError", "estudianteRegistro");
             model.addAttribute("correoIngresado", correo);
             return "Login";
         }
 
-        String passLower = passwordCliente.toLowerCase();
+        String passLower = passwordEstudiante.toLowerCase();
         for (String malaPalabra : PALABRAS_OFENSIVAS) {
             if (passLower.contains(malaPalabra)) {
                 model.addAttribute("error", "La contraseña contiene lenguaje inapropiado. Por favor, usa otra.");
-                model.addAttribute("tipoError", "clienteRegistro"); 
+                model.addAttribute("tipoError", "estudianteRegistro"); 
                 model.addAttribute("correoIngresado", correo); 
                 return "Login";
             }
         }
 
-        Cliente cliente = new Cliente();
+        Estudiante estudiante = new Estudiante();
         String nombreGenerado = correo.split("@")[0];
-        cliente.setNombre(nombreGenerado); 
-        cliente.setCorreo(correo.trim());
-        cliente.setPassword(passwordCliente.trim());
-        cliente.setEstado(true); 
+        estudiante.setNombre(nombreGenerado); 
+        estudiante.setCorreo(correo.trim());
+        estudiante.setPassword(passwordEstudiante.trim());
+        estudiante.setEstado(true); 
         
-        clienteRepository.save(cliente);
+        estudianteRepository.save(estudiante);
 
         redirectAttributes.addFlashAttribute("success", "Cuenta creada exitosamente. Ahora puedes iniciar sesión.");
         return "redirect:/";
@@ -184,10 +184,15 @@ public class LoginController {
             session.setAttribute("rolAdmin", admin.getRol()); 
             session.setAttribute("adminNombre", admin.getNombre());
             
-            session.setMaxInactiveInterval(180); 
+            session.setMaxInactiveInterval(1800); 
             redirectAttributes.addFlashAttribute("welcomeUser", admin.getNombre());
             
-            return "redirect:/admin/panel";
+            // REDIRECCIÓN SEGÚN ROL
+            if ("ADMINISTRADOR".equals(admin.getRol())) {
+                return "redirect:/admin/panel";
+            } else {
+                return "redirect:/docente/panel";
+            }
             
         } else {
             model.addAttribute("error", "Credenciales incorrectas o usuario no autorizado.");
@@ -197,31 +202,36 @@ public class LoginController {
         }
     }
     
-    @GetMapping("/encuesta")
-    public String mostrarEncuesta(HttpSession session, Model model) {
-        if (session.getAttribute("clienteId") == null) {
+    @GetMapping("/simulador")
+    public String mostrarSimulador(HttpSession session, Model model) {
+        if (session.getAttribute("estudianteId") == null) {
             return "redirect:/"; 
         }
-        model.addAttribute("preguntas", preguntaRepository.findAll());
-        
-        return "EncuestaCliente"; 
+        return "SimuladorEstudiante"; 
     }
 
     @GetMapping("/admin/panel")
     public String mostrarPanel(HttpSession session, Model model) {
-        if (session.getAttribute("adminLogueado") == null) {
+        if (session.getAttribute("adminLogueado") == null || !"ADMINISTRADOR".equals(session.getAttribute("rolAdmin"))) {
             return "redirect:/"; 
         }
         
-        String rolActual = (String) session.getAttribute("rolAdmin");
-        model.addAttribute("rolActual", rolActual);
+        model.addAttribute("rolActual", "ADMINISTRADOR");
         model.addAttribute("nombreAdmin", session.getAttribute("adminNombre"));
+        model.addAttribute("estudiantes", estudianteRepository.findAll());
+        model.addAttribute("docentes", adminRepository.findByRol("DOCENTE"));
         
-        if ("ADMINISTRADOR".equals(rolActual)) {
-            model.addAttribute("estudiantes", clienteRepository.findAll());
-            model.addAttribute("docentes", adminRepository.findByRol("DOCENTE"));
-            model.addAttribute("preguntas", preguntaRepository.findAll()); 
+        return "PanelAdministrativo"; 
+    }
+
+    @GetMapping("/docente/panel")
+    public String mostrarPanelDocente(HttpSession session, Model model) {
+        if (session.getAttribute("adminLogueado") == null || !"DOCENTE".equals(session.getAttribute("rolAdmin"))) {
+            return "redirect:/"; 
         }
+        
+        model.addAttribute("rolActual", "DOCENTE");
+        model.addAttribute("nombreAdmin", session.getAttribute("adminNombre"));
         
         return "PanelAdministrativo"; 
     }
@@ -254,14 +264,14 @@ public class LoginController {
 
         String regexSeguridad = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$";
         if (!password.matches(regexSeguridad)) {
-            redirectAttributes.addFlashAttribute("errorAdmin", "La contraseña del docente debe tener más seguridad (Mayúscula, minúscula, caracter especial, minimo 8 caracteres).");
+            redirectAttributes.addFlashAttribute("errorAdmin", "La contraseña del docente debe tener más seguridad.");
             return "redirect:/admin/panel";
         }
 
         String passLower = password.toLowerCase();
         for (String malaPalabra : PALABRAS_OFENSIVAS) {
             if (passLower.contains(malaPalabra)) {
-                redirectAttributes.addFlashAttribute("errorAdmin", "La contraseña contiene lenguaje inapropiado. Por favor, usa otra.");
+                redirectAttributes.addFlashAttribute("errorAdmin", "La contraseña contiene lenguaje inapropiado.");
                 return "redirect:/admin/panel";
             }
         }
@@ -311,7 +321,7 @@ public class LoginController {
             if(password != null && !password.trim().isEmpty()) {
                 String regexSeguridad = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$";
                 if (!password.matches(regexSeguridad)) {
-                    redirectAttributes.addFlashAttribute("errorAdmin", "La nueva contraseña debe tener (Mayúscula, minúscula, un caracter especial y minimo 8 caracteres).");
+                    redirectAttributes.addFlashAttribute("errorAdmin", "La nueva contraseña debe tener mayor seguridad.");
                     return "redirect:/admin/panel";
                 }
 
@@ -355,38 +365,11 @@ public class LoginController {
     public String toggleEstudiante(@PathVariable("id") Integer id, HttpSession session) {
         if (session.getAttribute("adminLogueado") == null) return "redirect:/"; 
         
-        Cliente cliente = clienteRepository.findById(id).orElse(null);
-        if (cliente != null) {
-            cliente.setEstado(cliente.getEstado() == null ? true : !cliente.getEstado()); 
-            clienteRepository.save(cliente);
+        Estudiante estudiante = estudianteRepository.findById(id).orElse(null);
+        if (estudiante != null) {
+            estudiante.setEstado(estudiante.getEstado() == null ? true : !estudiante.getEstado()); 
+            estudianteRepository.save(estudiante);
         }
-        return "redirect:/admin/panel";
-    }
-
-    @PostMapping("/admin/mantenimiento/crear")
-    public String crearPregunta(Pregunta pregunta, HttpSession session) {
-        if (session.getAttribute("adminLogueado") == null || !"ADMINISTRADOR".equals(session.getAttribute("rolAdmin"))) {
-            return "redirect:/"; 
-        }
-        preguntaRepository.save(pregunta);
-        return "redirect:/admin/panel";
-    }
-
-    @PostMapping("/admin/mantenimiento/editar")
-    public String editarPregunta(Pregunta preguntaEditada, HttpSession session) {
-        if (session.getAttribute("adminLogueado") == null || !"ADMINISTRADOR".equals(session.getAttribute("rolAdmin"))) {
-            return "redirect:/"; 
-        }
-        preguntaRepository.save(preguntaEditada);
-        return "redirect:/admin/panel";
-    }
-
-    @GetMapping("/admin/mantenimiento/eliminar/{id}")
-    public String eliminarPregunta(@PathVariable("id") Long id, HttpSession session) {
-        if (session.getAttribute("adminLogueado") == null || !"ADMINISTRADOR".equals(session.getAttribute("rolAdmin"))) {
-            return "redirect:/"; 
-        }
-        preguntaRepository.deleteById(id);
         return "redirect:/admin/panel";
     }
 
@@ -395,5 +378,4 @@ public class LoginController {
         session.invalidate(); 
         return "redirect:/"; 
     }
-    
 }

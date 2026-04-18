@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Yachay Tech | Simulador Estratégico</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	<style>
+	    * { margin: 0; padding: 0; box-sizing: border-box; }
+	    
+	    :root {
+	        --bg-base: #F6F4F0; --surface-white: #FFFFFF; --text-primary: #2A2A2A;
+	        --text-secondary: #5A5A5A; --text-muted: #8A8A8A; --border-light: #EAE7E2;
+	        --accent-gold: #B48C48; --accent-gold-dark: #9B723C; --accent-deep: #2C3E2F;
+	        --success: #2e7d32; --success-light: #edf7ed;
+	        --shadow-sm: 0 12px 30px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.02);
+	        --shadow-hover: 0 20px 35px -12px rgba(0, 0, 0, 0.12);
+	        --radius-card: 24px; --radius-element: 16px;
+	        --transition-base: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+	    }
+	    
+	    body { font-family: 'Inter', sans-serif; background-color: var(--bg-base); color: var(--text-primary); display: flex; flex-direction: column; height: 100vh; overflow: hidden; line-height: 1.45; }
+	    .main-layout { display: flex; flex: 1; overflow: hidden; width: 100%; }
+
+	    .sidebar { width: 300px; background: var(--surface-white); border-right: 1px solid var(--border-light); display: flex; flex-direction: column; z-index: 20; transition: var(--transition-base); box-shadow: 2px 0 12px rgba(0, 0, 0, 0.02); }
+	    .brand { padding: 32px 28px; border-bottom: 1px solid var(--border-light); margin-bottom: 20px; text-align: center; position: relative; }
+	    .brand-info { display: flex; flex-direction: column; align-items: center; }
+		.brand img { max-width: 180px; height: auto;  display: block; margin: -40px; transition: var(--transition-base); }
+	    .brand img:hover { transform: scale(1.03); }
+		.brand p { font-size: 12px; color: var(--text-muted); margin-top: 5px; letter-spacing: 0.3px; }
+	    .mobile-logout { display: none; }
+	    
+	    .menu-list { flex: 1; padding: 0 12px 16px 12px; overflow-y: auto; display: flex; flex-direction: column; scroll-behavior: smooth; }
+	    .sidebar-footer { padding: 5px 12px; border-top: 1px solid var(--border-light); background: var(--surface-white); }
+	    .menu-item { padding: 14px 18px; margin-bottom: 6px; border-radius: 14px; color: var(--text-secondary); cursor: pointer; font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 14px; transition: var(--transition-base); background: transparent; }
+	    .menu-item i { width: 24px; font-size: 1.2rem; color: var(--text-muted); transition: var(--transition-base); }
+	    .menu-item:hover { background: #F0EEE9; color: var(--accent-gold-dark); }
+	    .menu-item:hover i { color: var(--accent-gold); }
+	    .menu-item.active { background: #F3EFE8; color: var(--accent-gold-dark); font-weight: 600; box-shadow: inset 0 0 0 1px rgba(180, 140, 72, 0.2), 0 2px 6px rgba(0,0,0,0.02); }
+	    .menu-item.active i { color: var(--accent-gold); }
+
+	    .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: var(--bg-base); position: relative; scroll-behavior: smooth; }
+	    .header { padding: 24px 40px; background: rgba(255, 255, 255, 0.72); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 20px; position: sticky; top: 0; z-index: 15; }
+	    .progress-label { font-size: 13px; font-weight: 500; color: var(--text-secondary); letter-spacing: 0.3px; white-space: nowrap; }
+	    .progress-container { flex: 1; height: 6px; background-color: #E5E0D8; border-radius: 12px; overflow: hidden; min-width: 100px; }
+	    .progress-bar-fill { background: linear-gradient(90deg, var(--accent-gold) 0%, #D4AF6A 100%); width: 0%; height: 100%; border-radius: 12px; transition: width 0.45s ease-out; }
+	    .progress-text { font-weight: 600; color: var(--accent-gold-dark); font-size: 14px; font-family: monospace; letter-spacing: 0.3px; background: rgba(180, 140, 72, 0.12); padding: 4px 12px; border-radius: 40px; white-space: nowrap; }
+
+	    .content-area { padding: 10px 48px; flex: 1; display: flex; justify-content: center; align-items: flex-start; }
+	    .step-container { background: var(--surface-white); border-radius: var(--radius-card); box-shadow: var(--shadow-sm); padding: 40px 44px; width: 100%; max-width: 880px; margin: 0 auto; transition: transform 0.2s ease, opacity 0.25s; border: 1px solid rgba(234, 231, 226, 0.6); display: none; }
+	    .step-container.active { display: block; animation: fadeSlideUp 0.4s ease-out; }
+	    @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+	    
+	    h2 { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px; letter-spacing: -0.3px; border-left: 4px solid var(--accent-gold); padding-left: 20px; }
+	    .step-container > p { margin-bottom: 24px; }
+
+	    .flex-container { display: flex; gap: 32px; margin-top: 32px; margin-bottom: 24px; align-items: center; flex-wrap: wrap; }
+	    .res-col { flex: 1; min-width: 250px; }
+	    .res-col-wide { flex: 1.5; min-width: 250px; }
+	    
+	    .info-item { background: #FCFAF7; padding: 18px; border-radius: 12px; border: 1px solid var(--border-light); border-left: 3px solid var(--accent-gold); }
+	    .resp-img { width: 100%; border-radius: 12px; object-fit: cover; box-shadow: var(--shadow-sm); }
+	    
+	    .market-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 32px; margin-bottom: 20px; }
+	    .market-card { background: #fff; border: 1px solid var(--border-light); border-radius: var(--radius-element); padding: 24px 16px; text-align: center; box-shadow: var(--shadow-sm); transition: var(--transition-base); display: flex; flex-direction: column; align-items: center; }
+	    .market-card:hover { border-color: var(--accent-gold); box-shadow: var(--shadow-hover); transform: translateY(-4px); }
+	    .market-icon { font-size: 28px; color: var(--text-primary); margin-bottom: 12px; width: 60px; height: 60px; border: 1px solid var(--text-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #FCFAF7; transition: all 0.3s ease;}
+	    .market-card:hover .market-icon { border-color: var(--accent-gold); color: var(--accent-gold); }
+	    .market-title { font-size: 14px; font-weight: 700; letter-spacing: 1px; color: var(--text-primary); margin-bottom: 12px; text-transform: uppercase; }
+	    .market-divider { width: 100%; border: none; border-top: 1px solid var(--border-light); margin-bottom: 16px; }
+	    .market-img { width: 100%; border-radius: 8px; margin-bottom: 16px; object-fit: cover; border: 1px solid var(--border-light); }
+	    .market-text { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; text-align: left; text-align: justify; hyphens: auto; }
+
+	    .analysis-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+	    .analysis-cards.two-cols { grid-template-columns: repeat(2, 1fr); max-width: 600px; margin: 0 auto; }
+	    
+	    .analysis-card { border: 1px solid var(--border-light); border-radius: var(--radius-element); padding: 24px 16px; text-align: center; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: space-between; cursor: pointer; transition: var(--transition-base); box-shadow: var(--shadow-sm); position: relative; overflow: hidden;}
+	    .analysis-card:hover { border-color: var(--accent-gold); box-shadow: var(--shadow-hover); transform: translateY(-4px); }
+	    .ac-icon { font-size: 24px; color: var(--text-primary); margin-bottom: 16px; width: 56px; height: 56px; border: 1px solid var(--text-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #FCFAF7; transition: all 0.3s ease;}
+	    .analysis-card:hover .ac-icon { color: var(--accent-gold); border-color: var(--accent-gold); }
+	    .ac-title { font-weight: 600; font-size: 15px; color: var(--text-primary); margin-bottom: 10px; min-height: 44px;}
+	    .ac-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px; flex-grow: 1; }
+	    .ac-btn-container { width: 100%; }
+	    
+	    .analysis-card.completed { border-color: var(--success); background: var(--success-light); opacity: 0.85; pointer-events: none; }
+	    .analysis-card.completed .ac-icon { color: var(--success); border-color: var(--success); background: #fff; }
+	    .analysis-card.completed::after { content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; top: 12px; right: 16px; color: var(--success); font-size: 20px; }
+
+	    .progress-indicator { text-align: center; margin-bottom: 20px; font-weight: 600; color: var(--accent-deep); background: #F3EFE8; padding: 8px 16px; border-radius: 20px; display: inline-block; font-size: 13.5px;}
+
+	    .footer-nav { position: sticky; bottom: 0; padding: 5px 48px; background: rgba(246, 244, 240, 0.95); backdrop-filter: blur(12px); border-top: 1px solid rgba(234, 231, 226, 0.9); z-index: 30; width: 100%; }
+	    .footer-nav-inner { display: flex; justify-content: space-between; align-items: center; max-width: 880px; margin: 0 auto; }
+	    .btn { padding: 12px 32px; border-radius: 40px; font-weight: 600; font-size: 14px; cursor: pointer; transition: var(--transition-base); border: 1px solid transparent; background: white; color: var(--text-secondary); border-color: var(--border-light); font-family: 'Inter', sans-serif; display: inline-flex; align-items: center; justify-content: center; gap: 8px;}
+	    .btn:hover { background: #F5F2ED; transform: translateY(-2px); }
+	    .btn-primary { background: linear-gradient(105deg, var(--accent-gold) 0%, var(--accent-gold-dark) 100%); color: white; border: none; box-shadow: 0 2px 6px rgba(180, 140, 72, 0.2); }
+	    .btn-primary:hover { background: linear-gradient(105deg, #c49a53 0%, #a77e42 100%); transform: translateY(-2px); box-shadow: 0 8px 18px rgba(180, 140, 72, 0.25); color: white; }
+	    .btn-outline { background: transparent; border: 1px solid var(--accent-gold); color: var(--accent-gold-dark); }
+	    .btn-outline:hover { background: #FCFAF7; border-color: var(--accent-gold-dark); color: var(--accent-gold-dark); }
+	    
+	    .bottom-footer { padding: 16px 40px; background: var(--surface-white); border-top: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted); z-index: 30; width: 100%; }
+	    .footer-brand { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 14px; color: var(--accent-gold-dark); letter-spacing: 1px;}
+	    
+	    .flip-card { background-color: transparent; perspective: 1000px; margin-top: 1.5rem; cursor: pointer; width: 100%; transition: height 0.3s ease;}
+	    
+	    #step-7 .flip-card { height: 380px; } 
+	    #step-10 .flip-card { height: 260px; } 
+
+	    .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
+	    .flip-card.is-flipped .flip-card-inner { transform: rotateY(180deg); }
+	    
+	    .flip-card-front, .flip-card-back { 
+	        position: absolute; width: 100%; height: 100%; 
+	        -webkit-backface-visibility: hidden; backface-visibility: hidden; 
+	        border-radius: var(--radius-card); 
+	        padding: 32px 36px; 
+	        display: flex; flex-direction: column; 
+	        justify-content: flex-start; 
+	        overflow-y: auto; 
+	        box-shadow: var(--shadow-sm); 
+	    }
+	    
+	    .flip-card-front { background: #FCFAF7; border: 1px solid var(--accent-gold); border-left: 6px solid var(--accent-gold); }
+	    .flip-card-back { background: var(--surface-white); border: 1px solid var(--border-light); border-left: 6px solid var(--accent-deep); transform: rotateY(180deg); }
+	    
+	    .fc-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--text-primary); margin-bottom: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; flex-shrink: 0;}
+	    .fc-content { font-size: 1rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px;}
+	    .click-hint { display: flex; align-items: center; gap: 8px; margin-top: auto; font-size: 0.9rem; color: var(--accent-gold-dark); font-weight: 600; justify-content: center; background: rgba(180, 140, 72, 0.08); padding: 10px; border-radius: 12px; flex-shrink: 0; }
+
+	    .option-label { display: flex; align-items: center; gap: 14px; padding: 16px 20px; border: 1px solid var(--border-light); border-radius: 12px; cursor: pointer; transition: var(--transition-base); background: var(--surface-white); }
+	    .option-label:hover { border-color: var(--accent-gold); background: #FCFAF7; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transform: translateX(4px); }
+	    .dynamic-nav { display: flex; gap: 16px; margin-top: 24px; flex-wrap: wrap; justify-content: center; border-top: 1px solid var(--border-light); padding-top: 24px;}
+	    
+	    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+	    .modal-overlay.active { opacity: 1; visibility: visible; }
+	    .modal-box { background: var(--surface-white); border-radius: var(--radius-card); padding: 36px 40px; width: 90%; max-width: 420px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); text-align: center; transform: scale(0.95) translateY(10px); transition: all 0.3s ease; }
+	    .modal-overlay.active .modal-box { transform: scale(1) translateY(0); }
+	    .modal-icon { font-size: 48px; margin-bottom: 16px; }
+	    .modal-icon.warning { color: var(--accent-gold); }
+	    .modal-icon.success { color: var(--success); }
+	    .modal-title { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 22px; color: var(--accent-deep); margin-bottom: 12px; letter-spacing: -0.5px; }
+	    .modal-message { font-size: 15px; color: var(--text-secondary); margin-bottom: 28px; line-height: 1.5; }
+	    .modal-btn { width: 100%; padding: 14px; }
+
+	    .scene { perspective: 1200px; width: 100%; height: 380px; display: flex; justify-content: center; align-items: center; background: #F9F7F3; border-radius: var(--radius-card); border: 1px solid var(--border-light); cursor: pointer; position: relative; overflow: hidden; box-shadow: inset 0 4px 15px rgba(0,0,0,0.02); transition: border-color 0.3s ease; }
+	    .scene.is-active { cursor: crosshair; border-color: var(--success); }
+	    .ground-shadow { position: absolute; top: 75%; left: 50%; width: 180px; height: 180px; background: rgba(0,0,0,0.06); border-radius: 50%; filter: blur(20px); transform: translate(-50%, -50%) rotateX(80deg); pointer-events: none; transition: transform 0.05s linear; }
+	    .scene.is-active .ground-shadow { background: rgba(46, 125, 50, 0.15); }
+	    .tablet-wrapper { position: relative; width: 220px; height: 320px; transform-style: preserve-3d; transform: rotateX(15deg) rotateY(-25deg); transition: transform 0.1s ease-out; pointer-events: none; }
+	    .face { position: absolute; display: flex; align-items: center; justify-content: center; background: #dcdfe3; border: 0.5px solid #dcdfe3; box-sizing: border-box; }
+	    .front { width: 220px; height: 320px; top: 0; left: 0; background: #0a0a0a; border-radius: 12px; border: 10px solid #1a1a1a; box-shadow: inset 0 0 20px rgba(255,255,255,0.05); overflow: hidden; z-index: 2; transform: translateZ(6.1px); }
+	    .front-screen { width: 100%; height: 100%; background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); display: flex; align-items: center; justify-content: center; flex-direction: column; position: relative; }
+	    .front-screen::after { content: '12:45'; position: absolute; top: 10px; left: 15px; color: white; font-size: 10px; font-weight: bold;}
+	    .front-screen i { font-size: 32px; color: rgba(255,255,255,0.9); margin-bottom: 10px; }
+	    .front-screen span { color: #fff; font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; letter-spacing: 1px;}
+	    .back { width: 220px; height: 320px; top: 0; left: 0; background: #dcdfe3; transform: rotateY(180deg) translateZ(6.1px); border-radius: 12px; box-shadow: inset 0 0 1px rgba(255,255,255,0.2); }
+	    .back-logo { color: #95989d; font-weight: 800; letter-spacing: 4px; font-size: 20px; text-transform: uppercase; }
+	    .camera { position: absolute; top: 20px; right: 20px; width: 22px; height: 22px; background: #222; border-radius: 50%; box-shadow: inset 0 0 5px #000, 0 0 0 2px #a0a0a0; }
+	    .right { width: 12.1px; height: 310px; top: 5px; left: 104px; background: linear-gradient(to bottom, #dcdfe3, #babbbe, #dcdfe3); transform: rotateY(90deg) translateZ(110px); box-shadow: inset -1px 0 1px rgba(0,0,0,0.1); }
+	    .left { width: 12.1px; height: 310px; top: 5px; left: 104px; background: linear-gradient(to bottom, #dcdfe3, #babbbe, #dcdfe3); transform: rotateY(-90deg) translateZ(110px); box-shadow: inset 1px 0 1px rgba(0,0,0,0.1); }
+	    .top { width: 210px; height: 12.1px; top: 154px; left: 5px; background: linear-gradient(to right, #dcdfe3, #babbbe, #dcdfe3); transform: rotateX(90deg) translateZ(160px); box-shadow: inset 0 -1px 1px rgba(0,0,0,0.1); }
+	    .bottom { width: 210px; height: 12.1px; top: 154px; left: 5px; background: linear-gradient(to right, #dcdfe3, #babbbe, #dcdfe3); transform: rotateX(-90deg) translateZ(160px); box-shadow: inset 0 1px 1px rgba(0,0,0,0.1); }
+
+
+	    @media (max-width: 992px) {
+	        .content-area { padding: 32px 24px; }
+	        .step-container { padding: 32px 36px; }
+	        .footer-nav { padding: 0px; }
+	        .market-cards, .analysis-cards { grid-template-columns: repeat(2, 1fr); }
+	    }
+
+	    @media (max-width: 768px) { 
+	        .sidebar { width: 260px; } 
+	        h2 { font-size: 24px; padding-left: 14px; } 
+	        .step-container { padding: 24px; }
+	        .flex-container { gap: 20px; margin-top: 20px; }
+
+	        .market-cards, .analysis-cards, .analysis-cards.two-cols {
+	            display: flex; flex-wrap: nowrap; overflow-x: auto; scroll-snap-type: x mandatory;
+	            gap: 16px; padding-bottom: 16px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; 
+	            margin-left: -24px; margin-right: -24px; padding-left: 24px; padding-right: 24px;
+	        }
+	        
+	        .market-cards::-webkit-scrollbar, .analysis-cards::-webkit-scrollbar { display: none; }
+	        
+	        .market-card, .analysis-card { flex: 0 0 85%; max-width: 85%; scroll-snap-align: center; padding: 20px 16px; }
+
+	        .info-item { padding: 14px 16px !important; } 
+	        .resp-img { max-height: 250px; } 
+	        
+	        #step-7 .flip-card { height: 420px; }
+	        #step-10 .flip-card { height: 280px; }
+	    }
+
+	    @media (max-width: 700px) { 
+	        body { height: auto; overflow: auto; } 
+	        .main-layout { flex-direction: column; height: auto; overflow: visible; } 
+	        
+	        .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; border-right: none; border-bottom: 1px solid var(--border-light); } 
+	        .brand { padding: 12px 16px; width: 100%; margin-bottom: 0; display: flex; align-items: center; justify-content: space-between; flex-direction: row;}
+	        .brand-info { display: flex; flex-direction: column; align-items: flex-start; }
+			.brand img { max-width: 180px; height: auto; display: block; margin: 0 auto 0 auto; transition: var(--transition-base); }
+			.brand p { font-size: 12px; color: var(--text-muted); margin-top: -15px; letter-spacing: 0.3px; }
+	        
+	        .mobile-logout { display: flex; align-items: center; gap: 6px; background: #FFF5F3; color: #D9775A; padding: 8px 14px; border-radius: 10px; font-size: 13px; text-decoration: none; font-weight: 600; border: 1px solid rgba(217, 119, 90, 0.2); transition: var(--transition-base);}
+	        
+	        .menu-list { display: flex; overflow-x: auto; padding: 12px; gap: 8px; flex: 1; flex-direction: row; align-items: center; } 
+	        .menu-list::-webkit-scrollbar { display: none; }
+	        .menu-item { white-space: nowrap; margin-bottom: 0; padding: 10px 14px; font-size: 13.5px;} 
+	        .sidebar-footer { display: none; } 
+	        
+	        .main-wrapper { height: auto; overflow: visible; }
+	        .header { padding: 16px 20px; flex-wrap: wrap; gap: 12px; top: -1px;}
+	        .progress-container { order: 3; width: 100%; margin-top: 4px; }
+	        
+	        .content-area { padding: 20px 12px; }
+	        .step-container { padding: 24px 20px; }
+	        
+	        .res-col, .res-col-wide { min-width: 100%; }
+	    }
+
+	    @media (max-width: 480px) {
+	        .brand img { max-width: 85px; } 
+	        .brand p { font-size: 8px; }
+	        .mobile-logout { font-size: 11px; padding: 6px 10px; gap: 4px; }
+
+	        h2 { font-size: 22px; }
+	        .market-card, .analysis-card { flex: 0 0 92%; max-width: 92%; padding: 20px 16px;}
+	        .market-icon, .ac-icon { width: 48px; height: 48px; font-size: 20px; margin-bottom: 12px; }
+	        .fc-title { font-size: 1.2rem; }
+	        
+	        #step-7 .flip-card { height: 480px; }
+	        #step-10 .flip-card { height: 300px; }
+	        
+	        .flip-card-front, .flip-card-back { padding: 24px 20px; }
+	        
+	        .btn { padding: 12px 20px; font-size: 13px; width: 100%; justify-content: center;}
+	        .footer-nav-inner { flex-direction: column; gap: 12px;}
+	        .footer-nav { padding: 16px; }
+	        .bottom-footer { flex-direction: column; gap: 8px; text-align: center; }
+	        .tablet-wrapper { transform: scale(0.85) rotateX(15deg) rotateY(-25deg); }
+	        .scene { height: 320px; }
+	        
+	        .market-cards, .analysis-cards, .analysis-cards.two-cols { margin-left: -20px; margin-right: -20px; padding-left: 20px; padding-right: 20px; }
+	    }
+	</style>
+</head>
+<body>
+
+<div class="main-layout">
+    
+    <div class="sidebar">
+        <div class="brand">
+            <div class="brand-info">
+                <img th:src="@{/img/logo.png}" src="logo.png" alt="Yachay Tech Logo">
+                <p>experiencia · innovación · confianza</p>
+            </div>
+            <a th:href="@{/logout}" class="mobile-logout"><i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span></a>
+        </div>
+        <div class="menu-list">
+            <div class="menu-item active" id="menu-step-1" onclick="goToStep(1)"><i class="fas fa-chalkboard-user"></i> Introducción</div>
+            <div class="menu-item" id="menu-step-2" onclick="goToStep(2)"><i class="fas fa-tablet-alt"></i> Nuestro Producto</div>
+            <div class="menu-item" id="menu-step-3" onclick="goToStep(3)"><i class="fas fa-chart-pie"></i> Mercado</div>
+            <div class="menu-item" id="menu-step-4" onclick="goToStep(4)"><i class="fas fa-user-tie"></i> Tu Rol</div>
+            
+            <div class="menu-item" id="menu-step-5" onclick="goToStep(5)"><i class="fas fa-user-graduate"></i> F1: Simulador</div>
+            <div class="menu-item" id="menu-step-6" onclick="if(completedAnalyses.length === 3) goToStep(8)"><i class="fas fa-users"></i> F2: Buyer Persona</div>
+        </div>
+        
+        <div class="sidebar-footer">
+            <a th:href="@{/logout}" class="menu-item" style="margin-bottom: 0; color: #D9775A; text-decoration: none; justify-content: center; background: #FFF5F3;">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </a>
+        </div>
+    </div>
+
+    <div class="main-wrapper">
+        <div class="header">
+            <span class="progress-label"><i class="fas fa-chart-line" style="margin-right: 6px;"></i> Progreso general</span>
+            <div class="progress-container">
+                <div class="progress-bar-fill" id="progress-bar"></div>
+            </div>
+            <span class="progress-text" id="progress-text">Cargando...</span>
+        </div>
+
+        <div class="content-area">
+            <form id="surveyForm" th:action="@{/guardarRespuesta}" method="post" style="width: 100%;">
+                
+                <div class="step-container active" id="step-1">
+                    <h2>Introducción</h2>                                
+                    <div class="flex-container">
+                        <div class="res-col">
+                            <img th:src="@{/img/empresa.png}" alt="Empresa Yachay Tech" class="resp-img">
+                        </div>                                        
+                        <div class="res-col-wide">
+                            <h3 style="font-family: 'Inter', sans-serif; font-size: 1.4rem; color: var(--text-primary); margin-bottom: 12px; font-weight: 600;">Yachay Tech</h3>
+							<p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.7; text-align: justify;">
+								YACHAY – TECH, fundada en 2023 por un grupo de ingenieros y especialistas en educación, nace con la misión de
+								"Cerrar la brecha digital en el Perú con tecnología soberana", tras observar que las grandes marcas globales no
+								diseñan productos pensando en la accidentada geografía peruana o en la economía de las familias de provincias.
+							</p>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.7; text-align: justify; margin-bottom: 40px;">
+					 Su nombre proviene del quechua Yachay (Saber/Aprender) y buscar transmitir esa esencia tecnológica con inclusión digital para todos los peruanos.                
+                    </p>                                
+                    <div style="text-align: center;">
+                        <div class="survey-note" style="background: #FCFAF7; padding: 12px 24px; border-radius: 8px; border: 1px solid var(--border-light); display: inline-block; margin-top: 0; font-size: 12px; color: var(--text-muted);">
+                            <i class="fas fa-lock"></i> Esta información es administrada por Yachay Tech.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-container" id="step-2">                                
+                    <h2>Tablet "Kallpa"</h2>                
+                    
+                    <div class="flex-container">
+                        <div class="res-col">
+                            <div class="scene" id="scene3d">
+                                <div class="ground-shadow" id="groundShadow3d"></div>
+                                <div class="tablet-wrapper" id="tablet3d">
+                                    <div class="face front">
+                                        <div class="front-screen">
+                                            <i class="fas fa-graduation-cap"></i>
+                                            <span>Yachay-Hub</span>
+                                        </div>
+                                    </div>
+                                    <div class="face back">
+                                        <div class="camera"></div>
+                                        <div class="back-logo">KALLPA</div>
+                                    </div>
+                                    <div class="face right"></div>
+                                    <div class="face left"></div>
+                                    <div class="face top"></div>
+                                    <div class="face bottom"></div>
+                                </div>
+                            </div>
+                            <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-top: 12px; font-weight: 500;">
+                                <i class="fas fa-mouse-pointer" style="color: var(--accent-gold);"></i> (PC) Haz clic en la tablet para girar. / (Móvil) Mantén presionado y arrastra.
+                            </p>
+                        </div>
+
+                        <div class="res-col-wide">
+                            <h3 style="font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--accent-deep); margin-bottom: 12px;">INFORMACIÓN DEL PRODUCTO</h3>
+                            <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px;">
+                                En el último año han lanzado al mercado una Tablet bajo la marca <strong>"Kallpa"</strong>.
+                            </p>
+                            
+                            <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 12px;">
+                                <li class="info-item">
+                                    <strong style="color: var(--text-primary); display: flex; align-items: center; gap: 8px; margin-bottom: 6px;"><i class="fas fa-microchip" style="color: var(--accent-gold);"></i> Especificaciones Técnicas:</strong>
+                                    <span style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; display: block;">Procesador de alto rendimiento para multitarea, batería de larga duración (ideal para zonas con cortes de energía) y pantalla con filtro de luz azul para lectura prolongada.</span>
+                                </li>
+                                <li class="info-item">
+                                    <strong style="color: var(--text-primary); display: flex; align-items: center; gap: 8px; margin-bottom: 6px;"><i class="fas fa-star" style="color: var(--accent-gold);"></i> Valor Agregado:</strong>
+                                    <span style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; display: block;">Incluye "Yachay-Hub", una plataforma preinstalada con contenido educativo del Ministerio de Educación (MINEDU) que funciona sin conexión a internet.</span>
+                                </li>
+                                <li class="info-item">
+                                    <strong style="color: var(--text-primary); display: flex; align-items: center; gap: 8px; margin-bottom: 6px;"><i class="fas fa-tag" style="color: var(--accent-gold);"></i> Precio:</strong>
+                                    <span style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; display: block;">S/ 850.00, un 40% más económica que una marca de alta gama.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-container" id="step-3">
+                    <h2>Situación del Mercado</h2>
+                    <p style="text-align: left; color: var(--text-secondary); margin-top:32px;margin-bottom: 8px; font-size: 1rem;">Lee la información del mercado para comprender el contexto actual.</p>
+                     
+                     <p style="text-align: center; font-size: 12px; color: var(--accent-gold-dark); display: none; margin-bottom: 10px;" id="swipe-hint-1"><i class="fas fa-arrows-alt-h"></i> Desliza horizontalmente para ver más</p>
+
+                     <div class="market-cards">
+                        <div class="market-card">
+                            <div class="market-title">El Cliente</div>
+                            <hr class="market-divider">
+                            <img th:src="@{/img/cliente.png}" alt="Cliente" class="market-img">
+                            <p class="market-text">
+                                Estudiantes de institutos y universidades en regiones como Cusco, Huancayo y Arequipa. Son jóvenes de 17 a 25 años (Generación Z) que buscan independencia, pero cuya compra suele ser financiada o aprobada por sus padres (Generación X).
+                            </p>
+                        </div>
+                        
+                        <div class="market-card">
+                            <div class="market-title">El Problema</div>
+                            <hr class="market-divider">
+                            <img th:src="@{/img/problema.png}" alt="Problema" class="market-img">
+                            <p class="market-text">
+                                Aunque el producto es superior en software local, el consumidor peruano tiene una fuerte creencia que la tecnología local es "ensamblada y de corta vida". Prefieren pagar más por una marca coreana o estadounidense solo por el "estatus" y la percepción de seguridad.
+                            </p>
+                        </div>
+
+                        <div class="market-card">
+                            <div class="market-title">Canales de Venta</div>
+                            <hr class="market-divider">
+                            <img th:src="@{/img/canalesventa.png}" alt="Canales de Venta" class="market-img">
+                            <p class="market-text">
+                                Tienda online propia, presencia en "marketplaces" como Falabella y pequeñas tiendas tecnológicas en centros comerciales regionales.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-container" id="step-4">
+                    <h2>Rol del Estudiante</h2>
+                    <div class="flex-container" style="align-items: flex-start;">
+                        <div class="res-col-wide">
+                            <p style="font-size: 1rem; color: var(--text-primary); font-weight: 500; margin-bottom: 16px; text-align: left;">
+                                Deberá asumir el rol de consultor de marketing frente a la empresa Yachay-Tech, con el objetivo de analizar y comprender el proceso de decisión de compra del cliente peruano.
+                            </p>
+                            <div style="background: #FCFAF7; padding: 18px 20px; border-radius: 12px; border-left: 4px solid var(--accent-gold); border-top: 1px solid var(--border-light); border-right: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light); text-align: left; width: 100%;">
+                                <p style="font-size: 0.95rem; color: var(--accent-deep); font-weight: 600; margin-bottom: 6px;"><i class="fas fa-key" style="color: var(--accent-gold); margin-right: 6px;"></i> Regla clave:</p>
+                                <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6;">
+                                    No existen decisiones “incorrectas”. Cada elección abre un camino con consecuencias diferentes que impactarán en la toma de decisiones al momento de implementar acciones estratégicas.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+					<div class="step-container" id="step-5">
+						<h2>PRIMERA FASE</h2>
+						<p style="text-align: left; color: var(--text-secondary); margin-top:32px;margin-bottom: 8px; font-size: 1rem;">Lee
+							con atención y elige el análisis con el que deseas comenzar.</p>
+						
+	                    <div class="flex-container">
+							<div class="res-col">
+								<img th:src="@{/img/escenario.png}" alt="Análisis de Escenario" class="resp-img">
+							</div>
+							<div class="res-col-wide">
+								<h3 style="font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--accent-deep); margin-bottom: 16px; font-weight: 600;">Escenario de crisis</h3>
+								<p style="font-size: 1rem; color: var(--text-primary); line-height: 1.8; text-align: justify; margin-bottom: 16px;">
+									Yachay-Tech ha detectado que, aunque hay mucho tráfico en su web, las ventas de su tablet "Kallpa" se detienen en el carrito de compras.
+								</p>
+								<p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.7; text-align: justify;">
+									En este momento usted debe decidir cuál será la ruta de acción para identificar los stoppers que no permiten concluir la compra del producto.
+								</p>
+							</div>
+						</div>
+						
+	                    <div style="text-align: center;">
+							<div class="progress-indicator" id="sim-progress-text">
+								<i class="fas fa-tasks" style="margin-right: 8px;"></i> Progreso: 0/3 Análisis completados
+							</div>
+						</div>
+						<p style="font-weight: 600; font-size: 1.1rem; color: var(--text-primary); text-align: center; margin-bottom: 32px; border-top: 1px solid var(--border-light); padding-top: 32px;">
+							Elige el análisis con el que deseas trabajar:
+						</p>
+	
+	                    <p style="text-align: center; font-size: 12px; color: var(--accent-gold-dark); display: none; margin-bottom: 10px;" id="swipe-hint-2"><i class="fas fa-arrows-alt-h"></i> Desliza horizontalmente para ver más</p>
+					
+						<div class="analysis-cards">
+							<div class="analysis-card" id="card-an-A" onclick="openAnalysis('A')">
+								<div class="ac-icon"><i class="fas fa-bullhorn"></i></div>
+								<div class="ac-title">Análisis de Estímulos</div>
+								<div class="ac-desc">Analiza los estímulos del entorno que influyen en la decisión de compra del cliente.</div>
+								<div class="ac-btn-container" id="btn-cont-A"><button type="button" class="btn btn-outline" style="width: 100%; font-size: 13px; padding: 10px;">Comenzar análisis &nbsp;<i class="fas fa-chevron-right"></i></button></div>
+							</div>
+					
+							<div class="analysis-card" id="card-an-B" onclick="openAnalysis('B')">
+								<div class="ac-icon"><i class="fas fa-head-side-virus"></i></div>
+								<div class="ac-title">Análisis de la Toma de Decisiones</div>
+								<div class="ac-desc">Comprende el proceso de toma de decisiones del cliente y detecta los puntos de fricción.</div>
+								<div class="ac-btn-container" id="btn-cont-B"><button type="button" class="btn btn-outline" style="width: 100%; font-size: 13px; padding: 10px;">Comenzar análisis &nbsp;<i class="fas fa-chevron-right"></i></button></div>
+							</div>
+					
+							<div class="analysis-card" id="card-an-C" onclick="openAnalysis('C')">
+								<div class="ac-icon"><i class="far fa-heart"></i></div>
+								<div class="ac-title">Análisis de Actitudes y Creencias</div>
+								<div class="ac-desc">Explora las actitudes y creencias del cliente que impactan su decisión de compra.</div>
+								<div class="ac-btn-container" id="btn-cont-C"><button type="button" class="btn btn-outline" style="width: 100%; font-size: 13px; padding: 10px;">Comenzar análisis &nbsp;<i class="fas fa-chevron-right"></i></button></div>
+							</div>
+						</div>
+	
+	                    <div id="btn-avance-fase2" style="text-align: center; display: none; margin-top: 40px; margin-bottom: 20px; animation: fadeSlideUp 0.4s ease-out;">
+	                        <button type="button" class="btn btn-primary" onclick="goToStep(8)" style="padding: 12px 28px; font-size: 1rem; display: inline-flex; align-items: center; box-shadow: 0 6px 15px rgba(180, 140, 72, 0.25);">
+	                            Avanzar a la Fase 2 <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+	                        </button>
+	                    </div>
+	
+	                </div>
+	
+	                <div class="step-container" id="step-6">
+	                    <h2>Selección de Instrumento</h2>
+	                    
+	                    <div style="background: var(--surface-white); padding: 32px 36px; border-radius: 16px; border: 1px solid var(--border-light); border-top: 4px solid var(--accent-deep); text-align: left; width: 100%; margin-top: 32px; margin-bottom: 40px; box-shadow: var(--shadow-sm);">
+	                        <h3 id="inst-title" style="font-family: 'Inter', sans-serif; font-size: 1.35rem; color: var(--accent-deep); margin-bottom: 16px; font-weight: 700;">Título</h3>
+	                        <p id="inst-intro" style="font-size: 1rem; color: var(--text-secondary); line-height: 1.7; text-align: justify; margin-bottom: 24px;">Intro</p>
+	                        <p style="font-size: 1.05rem; color: var(--text-primary); font-weight: 600;">
+	                            En este punto tienes tres instrumentos de investigación que podrías aplicar para identificar los stoppers en esta ruta:
+	                        </p>
+	                    </div>
+	
+	                    <div id="inst-buttons" style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 16px;"></div>
+	                    
+	                   
+	                </div>
+	
+	                <div class="step-container" id="step-7">
+	                    <h2>Resultados Obtenidos</h2>
+	                    <p style="text-align: center; color: var(--text-secondary); margin-bottom: 10px;">Analiza cuidadosamente los hallazgos de tu investigación.</p>
+	                    
+	                    <div class="flip-card" onclick="this.classList.toggle('is-flipped')">
+	                        <div class="flip-card-inner">
+	                            <div class="flip-card-front">
+	                                <div class="fc-title"><i class="fas fa-comment-dots" style="color: var(--accent-gold); margin-right: 8px;"></i> Feedback del Simulador:</div>
+	                                <div class="fc-content" id="res-feedback"></div>
+	                                <div class="click-hint"><i class="fas fa-sync-alt"></i> Haz clic en la tarjeta para ver los hallazgos reales</div>
+	                            </div>
+	                            <div class="flip-card-back">
+	                                <div class="fc-title"><i class="fas fa-search-chart" style="color: var(--accent-deep); margin-right: 8px;"></i> Hallazgos del Instrumento:</div>
+	                                <div class="fc-content" id="res-data"></div>
+	                                <div class="click-hint" style="background: rgba(44, 62, 47, 0.08); color: var(--accent-deep);"><i class="fas fa-undo"></i> Haz clic para volver al feedback</div>
+	                            </div>
+	                        </div>
+	                    </div>
+	
+	                    <div class="dynamic-nav" id="dynamic-nav-buttons"></div>
+	                </div>
+	
+	                <div class="step-container" id="step-8">
+	                    <h2>2da FASE: Identificación del Buyer Persona</h2>
+	                    
+	                    <div style="background: var(--surface-white); padding: 24px 32px; border-radius: 16px; border: 1px solid var(--border-light); border-left: 4px solid var(--accent-deep); margin-bottom: 32px; box-shadow: var(--shadow-sm);">
+	                        <h3 style="font-size: 1.1rem; color: var(--accent-deep); margin-bottom: 12px;">RESUMEN DE LOS RESULTADOS OBTENIDOS:</h3>
+	                        <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 8px;">En este momento sabemos que:</p>
+	                        <ul style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; padding-left: 20px;">
+	                            <li style="margin-bottom: 8px;"><strong>Análisis de estímulos:</strong> El entorno digital no estimula los sentidos. El contacto físico rompe prejuicios. Existe una fuerte necesidad de seguridad y protección.</li>
+	                            <li style="margin-bottom: 8px;"><strong>Análisis de la toma de decisiones:</strong> Existe influencia de líderes de opinión. La decisión se trunca en la tienda por inseguridad del padre ante el vendedor.</li>
+	                            <li style="margin-bottom: 8px;"><strong>Análisis de actitudes y creencias:</strong> Fuerte prejuicio cognitivo hacia lo nacional. Se percibe como básico o descartable frente a marcas globales.</li>
+	                        </ul>
+	                    </div>
+	
+	                    <p style="font-size: 1rem; color: var(--text-primary); text-align: center; margin-bottom: 32px; line-height: 1.6;">
+	                        El siguiente paso es utilizar estos resultados para definir el perfil del Buyer Persona de la tablet "Kallpa".<br>
+	                        <strong>Hasta este momento tenemos claro que el cliente de Yachay - Tech tiene dos categorías. Elige cuál definir primero:</strong>
+	                    </p>
+	
+	                    <p style="text-align: center; font-size: 12px; color: var(--accent-gold-dark); display: none; margin-bottom: 10px;" id="swipe-hint-3"><i class="fas fa-arrows-alt-h"></i> Desliza horizontalmente para ver más</p>
+	
+	                    <div class="analysis-cards two-cols">
+	                        <div class="analysis-card" id="card-bp-hijo" onclick="openProfile('Hijo')">
+	                            <div class="ac-icon"><i class="fas fa-user-graduate"></i></div>
+	                            <div class="ac-title">Buyer Persona "Hijo"</div>
+	                            <div class="ac-btn-container" id="btn-cont-hijo"><button type="button" class="btn btn-outline" style="width: 100%; font-size: 13px; padding: 10px;">Definir Perfil &nbsp;<i class="fas fa-chevron-right"></i></button></div>
+	                        </div>
+	                        
+	                        <div class="analysis-card" id="card-bp-padre" onclick="openProfile('Padre')">
+	                            <div class="ac-icon"><i class="fas fa-user-tie"></i></div>
+	                            <div class="ac-title">Buyer Persona "Padre"</div>
+	                            <div class="ac-btn-container" id="btn-cont-padre"><button type="button" class="btn btn-outline" style="width: 100%; font-size: 13px; padding: 10px;">Definir Perfil &nbsp;<i class="fas fa-chevron-right"></i></button></div>
+	                        </div>
+	                    </div>
+	
+	                    <div id="btn-avance-fase3" style="text-align: center; display: none; margin-top: 40px; margin-bottom: 20px; animation: fadeSlideUp 0.4s ease-out;">
+	                        <button type="button" class="btn btn-primary" onclick="showModal('¡Felicidades! Has completado la Fase 2 definiendo ambos Buyer Personas.', 'success')" style="padding: 12px 28px; font-size: 1rem; display: inline-flex; align-items: center; box-shadow: 0 6px 15px rgba(180, 140, 72, 0.25);">
+	                            Avanzar a la Fase 3 <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+	                        </button>
+	                    </div>
+	                </div>
+	
+	                <div class="step-container" id="step-9">
+	                    <h2 id="prof-title">Título</h2>
+	                    
+	                    <div style="background: var(--surface-white); padding: 32px 36px; border-radius: 16px; border: 1px solid var(--border-light); border-top: 4px solid var(--accent-deep); text-align: left; width: 100%; margin-top: 32px; margin-bottom: 40px; box-shadow: var(--shadow-sm);">
+	                        <p id="prof-intro" style="font-size: 1rem; color: var(--text-secondary); line-height: 1.7; text-align: justify; margin-bottom: 24px;"></p>
+	                        <p style="font-size: 1.05rem; color: var(--text-primary); font-weight: 600;">
+	                            Con los resultados obtenidos en la investigación, define el perfil que mejor los representa:
+	                        </p>
+	                    </div>
+	
+	                    <div id="prof-buttons" style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 16px;"></div>
+	                    
+	                    <div style="text-align: center; margin-top: 32px;">
+	                        <button type="button" class="btn" onclick="goToStep(8)"><i class="fas fa-arrow-left"></i> Volver a Fase 2</button>
+	                    </div>
+	                </div>
+	
+	                <div class="step-container" id="step-10">
+	                    <h2>Evaluación del Perfil</h2>
+	                    <p style="text-align: center; color: var(--text-secondary); margin-bottom: 10px;">Analiza el feedback de tu elección.</p>
+	                    
+	                    <div class="flip-card" onclick="this.classList.toggle('is-flipped')">
+	                        <div class="flip-card-inner">
+	                            <div class="flip-card-front">
+	                                <div class="fc-title"><i class="fas fa-comment-dots" style="color: var(--accent-gold); margin-right: 8px;"></i> Feedback del Simulador:</div>
+	                                <div class="fc-content" id="prof-feedback"></div>
+	                                <div class="click-hint"><i class="fas fa-sync-alt"></i> Haz clic en la tarjeta para continuar</div>
+	                            </div>
+	                            <div class="flip-card-back">
+	                                <div class="fc-title"><i class="fas fa-clipboard-check" style="color: var(--accent-deep); margin-right: 8px;"></i> Siguiente Acción:</div>
+	                                <div class="fc-content" id="prof-action-text" style="font-weight: 600; text-align: center; margin-top: 40px;"></div>
+	                                <div class="click-hint" style="background: rgba(44, 62, 47, 0.08); color: var(--accent-deep);"><i class="fas fa-undo"></i> Haz clic para volver al feedback</div>
+	                            </div>
+	                        </div>
+	                    </div>
+	
+	                    <div class="dynamic-nav" id="prof-nav-buttons"></div>
+	                </div>
+
+            </form>
+        </div>
+
+        <div class="footer-nav">
+            <div class="footer-nav-inner">
+                <button type="button" class="btn" id="btn-prev" onclick="changeStep(-1)"><i class="fas fa-chevron-left"></i> Anterior</button>
+                <button type="button" class="btn btn-primary" id="btn-next" onclick="changeStep(1)">Siguiente <i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bottom-footer">
+    <div class="footer-brand">YACHAY TECH</div>
+    <div>© 2026 Yachay Tech — Todos los derechos reservados</div>
+</div>
+
+<div class="modal-overlay" id="customModal">
+    <div class="modal-box">
+        <div class="modal-icon" id="modalIcon"><i class="fas fa-exclamation-circle"></i></div>
+        <div class="modal-title">YACHAY TECH</div>
+        <div class="modal-message" id="modalMessage">Mensaje</div>
+        <button type="button" class="btn btn-primary modal-btn" onclick="closeModal()">Aceptar</button>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", () => {
+        const scene = document.getElementById('scene3d');
+        const tablet = document.getElementById('tablet3d');
+        const groundShadow = document.getElementById('groundShadow3d');
+        
+        let isActive = false;
+        let startX = 0;
+        let startY = 0;
+        let currentRotX = 15;
+        let currentRotY = -25;
+        let targetRotX = 15;
+        let targetRotY = -25;
+
+        if (scene) {
+            scene.addEventListener('click', (e) => {
+                if (e.pointerType === 'touch') return;
+                
+                e.stopPropagation();
+                isActive = !isActive;
+                if (isActive) {
+                    scene.classList.add('is-active');
+                    startX = e.clientX;
+                    startY = e.clientY;
+                } else {
+                    scene.classList.remove('is-active');
+                }
+            });
+
+            scene.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                scene.classList.add('is-active');
+            }, { passive: true });
+
+            scene.addEventListener('touchmove', (e) => {
+                e.preventDefault(); 
+                
+                let deltaX = e.touches[0].clientX - startX;
+                let deltaY = e.touches[0].clientY - startY;
+                
+                targetRotY = currentRotY + (deltaX * 0.4); 
+                targetRotX = currentRotX - (deltaY * 0.4); 
+                
+                if (tablet) tablet.style.transform = `rotateX(${targetRotX}deg) rotateY(${targetRotY}deg)`;
+                
+                if(groundShadow) {
+                    let shadowX = -50 + (targetRotY * 0.05);
+                    groundShadow.style.transform = `translate(${shadowX}%, -50%) rotateX(80deg)`;
+                }
+                
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                currentRotX = targetRotX;
+                currentRotY = targetRotY;
+            }, { passive: false });
+
+            scene.addEventListener('touchend', () => {
+                scene.classList.remove('is-active');
+            });
+            
+            scene.addEventListener('touchcancel', () => {
+                scene.classList.remove('is-active');
+            });
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.pointerType === 'touch') return;
+            if (isActive && scene) {
+                isActive = false;
+                scene.classList.remove('is-active');
+            }
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (isActive && tablet) {
+                let deltaX = e.clientX - startX;
+                let deltaY = e.clientY - startY;
+                
+                targetRotY = currentRotY + (deltaX * 0.4); 
+                targetRotX = currentRotX - (deltaY * 0.4); 
+                
+                tablet.style.transform = `rotateX(${targetRotX}deg) rotateY(${targetRotY}deg)`;
+                
+                if(groundShadow) {
+                    let shadowX = -50 + (targetRotY * 0.05);
+                    groundShadow.style.transform = `translate(${shadowX}%, -50%) rotateX(80deg)`;
+                }
+                
+                startX = e.clientX;
+                startY = e.clientY;
+                currentRotX = targetRotX;
+                currentRotY = targetRotY;
+            }
+        });
+    });
+
+    const database = {
+        'A': {
+            title: "ANÁLISIS A: Análisis de Estímulos",
+            intro: "Excelente, has decidido iniciar con un enfoque sensorial y de motivación, donde el foco de la investigación se desplaza hacia cómo los estímulos físicos y las necesidades psicológicas de seguridad y autorrealización afectan el comportamiento.",
+            instruments: [
+                {
+                    name: "Auditoría de Contenido Multimedia y UX",
+                    feedback: "¡Excelente elección! Estás aplicando el concepto de sensaciones al entorno digital. Revisar cómo el cliente percibe visualmente la tablet es fundamental para un negocio que opera con un cliente digitalizado.",
+                    result: `Existe falla sensorial, las fotos en la web son estáticas y no muestra la fluidez del procesador en multitarea, lo que impide que el cliente genere una sensación de velocidad.
+					El contenido educativo "Yachay-Hub" está "escondido" en una pestaña secundaria, lo que dificulta que el estudiante perciba de inmediato cómo la tablet le ayudará a mejorar sus notas.
+					Has identificado que el entorno digital no está estimulando los sentidos del cliente.`
+                },
+                {
+                    name: "Test de Producto en Puntos de Venta (Pop-up Stores)",
+                    feedback: "¡Muy bien pensado! Al permitir el contacto físico, estás activando el canal sensorial completo del cliente. Esto es vital para romper la creencia de que la tecnología local es de 'baja calidad', permitiendo que la percepción se base en la experiencia real y no en prejuicios; sin embargo, los datos que recojas pueden estar sesgados por parte de quien aplique el test.",
+                    result: `El 85% de los padres se sorprendió positivamente al tocar el aluminio reforzado, ya que esperaban plástico barato debido al precio bajo.
+					Algunos usuarios reportaron que el brillo de la pantalla en exteriores (plazas principales) es insuficiente, lo que afecta la sensación de utilidad en el campo.
+					Se observó que los padres solo se acercan al módulo si ven a otros padres probando el equipo primero.
+					Has descubierto que el contacto físico rompe la creencia negativa de "mala calidad".`
+                },
+                {
+                    name: "Prueba de Rendimiento Crítico de Yachay-Hub",
+                    feedback: "¡Decisión estratégica superior! Has seleccionado una herramienta que analiza profundamente la motivación del cliente. Al demostrar el valor de 'Yachay-Hub' sin conexión y la durabilidad de la batería en condiciones reales, estás atacando directamente la necesidad psicológica de seguridad que el padre de familia peruano exige para aprobar la compra.",
+                    result: `Al ver la tablet caer desde 1 metro sin sufrir daños, el nivel de estrés de los padres bajó drásticamente y su intención de compra subió un 60%.
+					El uso de "Yachay-Hub" sin internet generó una sensación de "alivio" y "empoderamiento" en estudiantes de zonas rurales, quienes lo ven como su única oportunidad de competir con alumnos de Lima.
+					Se descubrió que el miedo al "robo" (falta de seguridad física en la calle) pesa más que el miedo a que el equipo se malogre.
+					Has llegado a la raíz, la motivación de seguridad no es solo técnica, es también contextual, el entorno peruano). Ahora sabes que, para vender, debes ofrecer tranquilidad total.`
+                }
+            ]
+        },
+        'B': {
+            title: "ANÁLISIS B: Análisis de la Toma de Decisiones",
+            intro: "¡Genial! En el contexto peruano, esto es vital porque la compra de tecnología no es una decisión aislada, sino que está fuertemente mediada por la familia, el grupo de pares (compañeros de estudio) y los líderes de opinión.",
+            instruments: [
+                {
+                    name: "Encuesta de Referidos y canales de información",
+					feedback: `¡Buen trabajo! Has elegido una herramienta eficiente para mapear las influencias externas cuantitativamente.
+					Identificar si el cliente llega por una red social o por recomendación de un amigo es el primer paso para entender el entorno del consumidor.`,
+					result: `El 65% de los clientes llegó por un video de TikTok, pero el 80% solo compró tras consultar a un "amigo que sabe de tecnología". El 40% de los padres mencionó que "el precio le hacía dudar" hasta que alguien de su confianza le dio el visto bueno.
+					Se ha identificado la falta de una figura de autoridad técnica local que valide la marca masivamente.
+					La información es útil para detectar tendencias. Te da el qué (la recomendación es clave), pero no el cómo.`
+                },
+                {
+                    name: "Etnografía Digital en Comunidades Universitarias",
+                    feedback: "¡Excelente enfoque! Al observar el comportamiento en su entorno natural, estás analizando los factores sociales y los grupos de referencia de la Generación Z. Este instrumento te permite ver la influencia de los pares en tiempo real, algo crucial para productos tecnológicos.",
+                    result:`En los grupos de WhatsApp de estudiantes, se descubrió que Yachay-Tech es vista como "la tablet para estudiar", pero se recomienda una marca global para "lucirse en la facultad". Existe un líder de opinión (el delegado o el alumno más aplicado) que tiene el poder de validar o destruir la reputación de la tablet con un solo comentario.
+					El factor social del estatus y la presión de grupo hace que asocien "lo peruano" con algo funcional pero no aspiracional.
+					Al observar sin intervenir, has captado la 'jerga' y el sentimiento real de la Generación Z. Posees datos cualitativos potentes sobre el factor social.`
+                },
+                {
+                    name: "Shadowing y Entrevista en el 'Punto de Decisión' (Tienda Física)",
+                    feedback: "¡Decisión estratégica sobresaliente! Has seleccionado el instrumento más profundo para este camino. Al observar la dinámica real entre el decisor y el influyente (padre-hijo), puedes identificar exactamente en qué etapa de la toma de decisiones surge el conflicto.",
+                    result: `Se observó que el hijo convence al padre en el pasillo usando argumentos de "tareas y software", pero al momento de sacar la tarjeta, el padre se detiene, mira las marcas globales vecinas y le pregunta al vendedor: ¿Cuál me recomienda usted?". Si el vendedor duda o no conoce Yachay-Tech, el padre aborta la compra inmediatamente por falta de seguridad.
+					El vendedor como influyente crítico y la inseguridad del padre en la etapa final del proceso de toma de decisiones.
+					La información es de altísima calidad y estratégica. Has presenciado el momento exacto del quiebre (la "hora de la verdad"). Tienes evidencia directa de cómo interactúan las influencias internas (el deseo del hijo) con las influencias externas (el vendedor y el entorno de la tienda).`
+                }
+            ]
+        },
+        'C': {
+            title: "ANÁLISIS C: Análisis de Actitudes y Creencias",
+            intro: "Excelente, has decidido iniciar con el análisis de las actitudes y creencias, que son barreras críticas en el mercado tecnológico peruano para marcas emergentes como Yachay-Tech.",
+            instruments: [
+                {
+                    name: "Encuesta Digital Estándar (Post-Abandono)",
+                    feedback: `¡Buena idea! Has elegido una herramienta que te permite obtener datos cuantitativos rápidamente y a bajo costo. Es un paso valioso para identificar tendencias generales en el comportamiento del cliente digitalizado; sin embargo, no podrás profundizar lo suficiente en las creencias subyacentes que el cliente no siempre expresa en una respuesta de "sí" o "no".`,
+                    result: `Resultados de la Encuesta Digital Estándar (Post-Abandono): El 55% de los encuestados marcó la opción "Desconfianza en la durabilidad del hardware".
+					El 80% considera que el precio de S/ 850.00 es "muy bueno", pero el 40% teme que lo barato signifique mala calidad.
+					El 70% de los usuarios digitales no sabía que la tablet incluye contenido del MINEDU que funciona sin internet.
+					Has obtenido datos fríos. Sabes qué está pasando (miedo a la durabilidad), pero no sabes el porqué.`
+                },
+                {
+                    name: "Entrevistas a Profundidad con el 'Comprador Dual'",
+                    feedback:`¡Excelente enfoque! Al incluir a ambos actores, estás reconociendo las influencias en la toma de decisiones. Estás logrando captar matices emocionales y motivaciones de seguridad que una encuesta ignoraría; sin embargo, requiere mucho tiempo de análisis y los resultados son difíciles de generalizar a toda la base de clientes de Yachay-Tech.`,
+                    result: `El Hijo (Gen Z): Tiene una actitud positiva hacia el software "Yachay-Hub", pero siente que la tablet no tiene "onda" o estatus frente a sus compañeros.
+					El Padre (Gen X): Es el principal stopper. Su creencia está basada en experiencias pasadas negativas con marcas ensambladas en Perú. Solo compraría si hubiera una garantía física cerca de su casa.
+					La etapa de "Evaluación de alternativas" se bloquea porque el padre prioriza la motivación de seguridad (durabilidad) mientras el hijo busca autorrealización (estudio).`
+                },
+                {
+                    name: "Focus Group de 'Asociación Implícita y Proyectiva'",
+                    feedback:`¡Impresionante decisión estratégica! Has seleccionado la herramienta cualitativa más potente para este escenario. Este instrumento te permitirá "hackear" las creencias arraigadas del consumidor peruano y entender el componente cognitivo real de su actitud negativa. Al separar la marca del producto, podrás demostrar si el stopper es el rendimiento técnico (sensaciones) o simplemente el estatus de la marca (creencias).`,
+                    result:`Los participantes describieron a Yachay-Tech como "un estudiante esforzado pero que usa ropa genérica", mientras que a la competencia global la ven como "el estudiante exitoso que todos admiran".
+					En una prueba "ciega" (sin marcas), el 90% prefirió la fluidez de la pantalla de la tablet Kallpa. Sin embargo, al ponerle el logo de Yachay-Tech, la percepción de calidad bajó automáticamente.
+					El cliente peruano sufre de un prejuicio cognitivo, asocia la tecnología nacional con "lo básico", ignorando que las especificaciones son de alta gama.`
+                }
+            ]
+        }
+    };
+
+    const phase2Database = {
+        'Hijo': {
+            title: 'BUYER PERSONA "HIJO"',
+            intro: 'Recordemos que son jóvenes estudiantes entre los 17 a 25 años en regiones como Cusco, Huancayo y Arequipa. Son impulsores de compra, mas no decisores.',
+            options: [
+                {
+                    name: '(+2.5) Joven universitario de 19 años, motivado por el rendimiento académico y la utilidad del software Yachay-Hub. Reconoce que la tablet le permite estudiar sin internet y valora la batería de larga duración. Busca autorrealización a través del estudio, pero siente presión social por el estatus de las marcas globales.',
+                    feedback: 'Este es un Buyer Persona claro, con motivaciones, barreras y contexto social bien definidos.'
+                },
+                {
+                    name: '(+2) Estudiante de 20 años, interesado en la funcionalidad de la tablet para tareas y proyectos. Reconoce la ventaja del precio accesible, pero duda de la durabilidad. La decisión depende de la validación de pares y de la confianza que le transmita el padre.',
+                    feedback: 'Este es un Buyer Persona útil, aunque con matices emocionales y sociales limitados.'
+                },
+                {
+                    name: '(+1) Joven de 18 años que ve la tablet como "una opción barata para estudiar". Percibe el software educativo como un plus, pero no lo considera decisivo. Su motivación principal es el precio, aunque no logra articular cómo influyen los pares o el padre en la decisión.',
+                    feedback: 'Este es un Buyer Persona incompleto, con foco en un solo factor (precio) y sin profundidad en las creencias.'
+                },
+                {
+                    name: '(+0.5) Joven de 18 años, quiere una tablet para estudiar y que tenga buena cámara para conectarse a clases. Se siente motivado por comprar, pero no sabe cómo ni para qué le será útil.',
+                    feedback: 'Este es un Buyer Persona poco útil, su aporte es limitado al orientar estrategias de posicionamiento.'
+                }
+            ]
+        },
+        'Padre': {
+            title: 'BUYER PERSONA "PADRE"',
+            intro: 'Recordemos que son adultos que forman parte de la generación X y son los que toman la decisión final de compra.',
+            options: [
+                {
+                    name: '(+2.5) Hombre de 45-55 años, trabajador de clase media en provincia, responsable de financiar la compra. Tiene experiencias negativas previas con tecnología ensamblada en Perú y teme que lo barato signifique poca durabilidad. Su motivación central es la seguridad: quiere garantía física cercana y confianza en el vendedor. Valora el precio, pero solo si se acompaña de respaldo técnico.',
+                    feedback: 'Este es un Buyer Persona completo, con motivaciones, barreras y contexto social/familiar bien definidos.'
+                },
+                {
+                    name: '(+2) Padre de 50 años, preocupado por la inversión en tecnología para su hijo. Reconoce que la tablet es económica y funcional, pero duda de la marca local. Necesita validación externa (vendedor, amigo experto) para sentirse seguro en la compra.',
+                    feedback: 'Este es un Buyer Persona útil, aunque con menor profundidad en las creencias culturales.'
+                },
+                {
+                    name: '(+1) Padre de 40 años, que percibe la tablet como "barata y suficiente para estudiar". No se exploran sus experiencias previas ni su contexto social. Su stopper principal es la desconfianza en la durabilidad, pero no se explica el porqué ni cómo se podría superar.',
+                    feedback: 'Este es un Buyer Persona incompleto, con foco en un solo aspecto (precio/durabilidad) y sin claridad sobre el proceso de decisión.'
+                },
+                {
+                    name: '(+0.5) Padre de 40-50años, es influenciado por las tendencias que observa en redes sociales, prefiere que su hijo decida y se encargará de darle el dinero que necesite. Su principal motivación es que el hijo sea feliz con el dispositivo que adquiera.',
+                    feedback: 'Este es un Buyer Persona poco útil, su aporte es limitado al orientar estrategias de posicionamiento.'
+                }
+            ]
+        }
+    };
+
+    let completedAnalyses = [];
+    let completedProfiles = [];
+    let currentAnalysisId = null;
+    let currentProfileId = null;
+    let currentStep = 1;
+    const totalSteps = 10; 
+
+    function showModal(message, type = 'warning') {
+        const modal = document.getElementById('customModal');
+        const iconContainer = document.getElementById('modalIcon');
+        const msgContainer = document.getElementById('modalMessage');
+
+        msgContainer.innerHTML = message;
+
+        if(type === 'success') {
+            iconContainer.innerHTML = '<i class="fas fa-check-circle"></i>';
+            iconContainer.className = 'modal-icon success';
+        } else {
+            iconContainer.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
+            iconContainer.className = 'modal-icon warning';
+        }
+
+        modal.classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('customModal').classList.remove('active');
+    }
+
+    function openAnalysis(id) {
+        if (completedAnalyses.includes(id)) {
+            showModal("Ya has completado este análisis. Elige uno diferente para continuar tu investigación.", "warning");
+            return;
+        }
+
+        currentAnalysisId = id;
+        const data = database[id];
+        
+        document.getElementById('inst-title').innerText = data.title;
+        document.getElementById('inst-intro').innerText = data.intro;
+        
+        const btnContainer = document.getElementById('inst-buttons');
+        btnContainer.innerHTML = '';
+        
+        data.instruments.forEach((inst, index) => {
+            const btn = document.createElement('div');
+            btn.className = 'option-label';
+            btn.style.justifyContent = 'space-between';
+            btn.innerHTML = `<span style="font-size: 1.05rem; color: var(--text-primary); font-weight: 600;">${inst.name}</span> <i class="fas fa-chevron-right" style="color: var(--accent-gold);"></i>`;
+            btn.onclick = () => showResults(id, index);
+            btnContainer.appendChild(btn);
+        });
+
+        goToStep(6);
+    }
+
+    function showResults(analysisId, instrumentIndex) {
+        const instrument = database[analysisId].instruments[instrumentIndex];
+        
+        document.getElementById('res-feedback').innerText = instrument.feedback;
+        document.getElementById('res-data').innerText = instrument.result;
+        
+        document.querySelector('#step-7 .flip-card').classList.remove('is-flipped');
+
+        if (!completedAnalyses.includes(analysisId)) {
+            completedAnalyses.push(analysisId);
+            
+            const card = document.getElementById(`card-an-${analysisId}`);
+            if(card) {
+                card.classList.add('completed');
+                document.getElementById(`btn-cont-${analysisId}`).style.display = 'none'; 
+            }
+            
+            document.getElementById('sim-progress-text').innerHTML = `<i class="fas fa-tasks" style="margin-right: 8px;"></i> Progreso: ${completedAnalyses.length}/3 Análisis completados`;
+        }
+
+        const navContainer = document.getElementById('dynamic-nav-buttons');
+        navContainer.innerHTML = ''; 
+        
+        if (completedAnalyses.length === 3) {
+            navContainer.innerHTML = `<button type="button" class="btn btn-primary" onclick="goToStep(5)" style="padding: 14px 32px; font-size: 1.1rem;">Ver Resumen de Fase 1 <i class="fas fa-arrow-right"></i></button>`;
+        } else {
+            let html = '';
+            if (!completedAnalyses.includes('A')) html += `<button type="button" class="btn btn-outline" onclick="openAnalysis('A')"><i class="fas fa-bullhorn"></i> Ir a Análisis de Estímulos</button>`;
+            if (!completedAnalyses.includes('B')) html += `<button type="button" class="btn btn-outline" onclick="openAnalysis('B')"><i class="fas fa-head-side-virus"></i> Ir a Análisis de Decisiones</button>`;
+            if (!completedAnalyses.includes('C')) html += `<button type="button" class="btn btn-outline" onclick="openAnalysis('C')"><i class="far fa-heart"></i> Ir a Análisis de Actitudes</button>`;
+            navContainer.innerHTML = html;
+        }
+
+        goToStep(7);
+    }
+
+    function openProfile(id) {
+        if (completedProfiles.includes(id)) {
+            return;
+        }
+        currentProfileId = id;
+        const data = phase2Database[id];
+        
+        document.getElementById('prof-title').innerText = data.title;
+        document.getElementById('prof-intro').innerText = data.intro;
+        
+        const btnContainer = document.getElementById('prof-buttons');
+        btnContainer.innerHTML = '';
+        
+        data.options.forEach((opt, index) => {
+            const btn = document.createElement('div');
+            btn.className = 'option-label';
+            btn.innerHTML = `<span style="font-size: 0.95rem; color: var(--text-primary); line-height: 1.5;">${opt.name}</span>`;
+            btn.onclick = () => showProfileResults(id, index);
+            btnContainer.appendChild(btn);
+        });
+
+        goToStep(9);
+    }
+
+    function showProfileResults(profileId, optionIndex) {
+        const option = phase2Database[profileId].options[optionIndex];
+        
+        document.getElementById('prof-feedback').innerText = option.feedback;
+        
+        document.querySelector('#step-10 .flip-card').classList.remove('is-flipped');
+
+        if (!completedProfiles.includes(profileId)) {
+            completedProfiles.push(profileId);
+            const card = document.getElementById(`card-bp-${profileId.toLowerCase()}`);
+            if(card) {
+                card.classList.add('completed');
+                const btnCont = document.getElementById(`btn-cont-${profileId.toLowerCase()}`);
+                if (btnCont) btnCont.style.display = 'none'; 
+            }
+        }
+
+        const navContainer = document.getElementById('prof-nav-buttons');
+        navContainer.innerHTML = ''; 
+        
+        if (completedProfiles.length === 2) {
+            document.getElementById('prof-action-text').innerText = "Has definido a ambos Buyer Personas exitosamente.";
+            navContainer.innerHTML = `<button type="button" class="btn btn-primary" onclick="goToStep(8)" style="padding: 14px 32px; font-size: 1.1rem;">Ver Resumen de Fase 2 <i class="fas fa-arrow-right"></i></button>`;
+        } else {
+            document.getElementById('prof-action-text').innerText = "Ahora, debes definir el perfil del Buyer Persona restante.";
+            let otherId = profileId === 'Hijo' ? 'Padre' : 'Hijo';
+            navContainer.innerHTML = `<button type="button" class="btn btn-outline" onclick="openProfile('${otherId}')"><i class="fas fa-user-check"></i> Definir Buyer Persona "${otherId}"</button>`;
+        }
+
+        goToStep(10);
+    }
+
+    function updateUI() {
+        for(let i = 1; i <= 10; i++) {
+            const stepDiv = document.getElementById(`step-${i}`);
+            if(stepDiv) stepDiv.classList.remove('active');
+        }
+
+        const menuItems = document.querySelectorAll('.menu-item');
+        menuItems.forEach(item => item.classList.remove('active'));
+
+        const activeStep = document.getElementById(`step-${currentStep}`);
+        if(activeStep) activeStep.classList.add('active');
+
+        let displayMenuId = currentStep;
+        if (currentStep >= 5 && currentStep <= 7) displayMenuId = 5;
+        if (currentStep >= 8 && currentStep <= 10) displayMenuId = 6;
+        
+        const activeMenu = document.getElementById(`menu-step-${displayMenuId}`);
+        if(activeMenu) {
+            activeMenu.classList.add('active');
+            
+            if (window.innerWidth <= 700) {
+                const menuList = document.querySelector('.menu-list');
+                if (menuList) {
+                    const offset = activeMenu.offsetLeft - (menuList.clientWidth / 2) + (activeMenu.clientWidth / 2);
+                    menuList.scrollTo({ left: offset, behavior: 'smooth' });
+                }
+            }
+        }
+
+        const percentage = Math.round((displayMenuId / 6) * 100);
+        document.getElementById('progress-bar').style.width = `${percentage}%`;
+        document.getElementById('progress-text').innerHTML = `${percentage}% (${displayMenuId}/6)`;
+
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+
+        if (currentStep === 1) {
+            btnPrev.style.visibility = 'hidden';
+        } else {
+            btnPrev.style.visibility = 'visible';
+        }
+
+        if (currentStep === 5) {
+            if (completedAnalyses.length === 3) {
+                document.getElementById('btn-avance-fase2').style.display = 'block';
+            }
+        }
+
+        if (currentStep === 8) {
+            if (completedProfiles.length === 2) {
+                document.getElementById('btn-avance-fase3').style.display = 'block';
+            }
+        }
+
+        if (currentStep >= 5) {
+            btnNext.style.display = 'none';
+            if (currentStep > 5) btnPrev.style.visibility = 'hidden'; 
+        } else {
+            btnNext.style.display = 'inline-flex';
+            if (currentStep === 4) {
+                btnNext.innerHTML = 'Iniciar Simulación <i class="fas fa-chevron-right"></i>';
+            } else {
+                btnNext.innerHTML = 'Siguiente <i class="fas fa-chevron-right"></i>';
+            }
+            btnNext.onclick = function() { changeStep(1); };
+        }
+
+        if (window.innerWidth <= 768) {
+            document.getElementById('swipe-hint-1').style.display = (currentStep === 3) ? 'block' : 'none';
+            document.getElementById('swipe-hint-2').style.display = (currentStep === 5) ? 'block' : 'none';
+            document.getElementById('swipe-hint-3').style.display = (currentStep === 8) ? 'block' : 'none';
+        } else {
+            document.getElementById('swipe-hint-1').style.display = 'none';
+            document.getElementById('swipe-hint-2').style.display = 'none';
+            document.getElementById('swipe-hint-3').style.display = 'none';
+        }
+    }
+
+    function changeStep(direction) {
+        let newStep = currentStep + direction;
+        if (newStep < 1) newStep = 1;
+        if (newStep > 5 && direction > 0 && currentStep < 5) newStep = 5; 
+        
+        if (currentStep === 4 && direction > 0) {
+            currentStep = 5; 
+        } else {
+            currentStep = newStep;
+        }
+        
+        updateUI();
+        document.querySelector('.main-wrapper').scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function goToStep(step) {
+        currentStep = step;
+        updateUI();
+        document.querySelector('.main-wrapper').scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        updateUI();
+        setTimeout(() => {
+            const nombreGuardado = /*[[${welcomeUser}]]*/ null;
+            if (nombreGuardado) {
+                showModal(`¡Hola, ${nombreGuardado}! Te damos la bienvenida a nuestra plataforma.`, 'welcome');
+            }
+        }, 400);
+    });
+
+    window.addEventListener('resize', updateUI);
+</script>
+</body>
+</html>

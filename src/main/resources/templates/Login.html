@@ -182,18 +182,18 @@
                     <div class="auth-tab" id="tabRegister" onclick="switchToRegister()">Crear cuenta</div>
                 </div>
 
-                <form id="mainForm" th:action="@{/loginCliente}" method="post" novalidate>
+                <form id="mainForm" th:action="@{/loginEstudiante}" method="post" novalidate>
 
                     <div class="form-group" id="correo-group">
                         <label for="correo"><i class="fas fa-envelope"></i> Correo de usuario</label>
                         <input type="email" name="correo" id="correo" placeholder="@cibertec.edu.pe" th:value="${correoIngresado}" required />
                     </div>
 
-                    <div class="form-group" id="pass-cliente-group">
-                        <label for="passwordCliente" id="passClienteLabel"><i class="fas fa-key"></i> Contraseña</label>
+                    <div class="form-group" id="pass-estudiante-group">
+                        <label for="passwordEstudiante" id="passEstudianteLabel"><i class="fas fa-key"></i> Contraseña</label>
                         <div class="password-wrapper">
-                            <input type="password" name="passwordCliente" id="passwordCliente" placeholder="••••••••" required />
-                            <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility('passwordCliente', this)"></i>
+                            <input type="password" name="passwordEstudiante" id="passwordEstudiante" placeholder="••••••••" required />
+                            <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility('passwordEstudiante', this)"></i>
                         </div>
                         <div class="password-helper" id="passHelper">
                             
@@ -265,9 +265,9 @@
     const correoGroup = document.getElementById('correo-group');
     const correoInput = document.getElementById('correo');
     
-    const passClienteGroup = document.getElementById('pass-cliente-group');
-    const passClienteInput = document.getElementById('passwordCliente');
-    const passClienteLabel = document.getElementById('passClienteLabel');
+    const passEstudianteGroup = document.getElementById('pass-estudiante-group');
+    const passEstudianteInput = document.getElementById('passwordEstudiante');
+    const passEstudianteLabel = document.getElementById('passEstudianteLabel');
     const passHelper = document.getElementById('passHelper'); 
     
     const passDocenteGroup = document.getElementById('pass-docente-group');
@@ -294,7 +294,7 @@
     const PIN_ADMIN = "1234";
     const PIN_DOCENTE = "5678";
 
-    let modoActual = 'clienteLogin';
+    let modoActual = 'estudianteLogin';
 
     const errorDiv = document.querySelector('.server-error');
     const successDiv = document.querySelector('.server-success');
@@ -310,12 +310,12 @@
             
             rememberMeCheck.checked = false;
             correoInput.value = '';
-            passClienteInput.value = '';
+            passEstudianteInput.value = '';
         } else {
             if (localStorage.getItem('yt_rememberMe') === 'true') {
                 rememberMeCheck.checked = true;
                 if (localStorage.getItem('yt_correo')) correoInput.value = localStorage.getItem('yt_correo');
-                if (localStorage.getItem('yt_pass')) passClienteInput.value = localStorage.getItem('yt_pass');
+                if (localStorage.getItem('yt_pass')) passEstudianteInput.value = localStorage.getItem('yt_pass');
             }
         }
     });
@@ -346,12 +346,12 @@
 
     function clearAllInputs() {
         if (correoInput) correoInput.value = '';
-        if (passClienteInput) passClienteInput.value = '';
+        if (passEstudianteInput) passEstudianteInput.value = '';
         if (passDocenteInput) passDocenteInput.value = '';
     }
 
-    function setModoClienteLogin() {
-        modoActual = 'clienteLogin';
+    function setModoEstudianteLogin() {
+        modoActual = 'estudianteLogin';
         docenteToggle.classList.remove('active');
         
         docenteToggle.style.display = 'inline-flex';
@@ -367,10 +367,10 @@
         correoInput.required = true; 
         correoInput.placeholder = "@cibertec.edu.pe";
 
-        passClienteGroup.style.display = 'block';
-        passClienteInput.disabled = false;
-        passClienteInput.required = true;
-        passClienteLabel.innerHTML = '<i class="fas fa-key"></i> Contraseña';
+        passEstudianteGroup.style.display = 'block';
+        passEstudianteInput.disabled = false;
+        passEstudianteInput.required = true;
+        passEstudianteLabel.innerHTML = '<i class="fas fa-key"></i> Contraseña';
         passHelper.style.display = 'none';
 
         passDocenteGroup.style.display = 'none';
@@ -383,11 +383,11 @@
         footerText.innerText = "Tus datos están protegidos y seguros.";
         hideError();
         
-        mainForm.setAttribute('action', '/loginCliente');
+        mainForm.setAttribute('action', '/loginEstudiante');
     }
 
-    function setModoClienteRegistro() {
-        modoActual = 'clienteRegistro';
+    function setModoEstudianteRegistro() {
+        modoActual = 'estudianteRegistro';
         docenteToggle.classList.remove('active');
         
         docenteToggle.style.display = 'none';
@@ -404,10 +404,10 @@
         correoInput.required = true; 
         correoInput.placeholder = "@cibertec.edu.pe";
 
-        passClienteGroup.style.display = 'block';
-        passClienteInput.disabled = false;
-        passClienteInput.required = true;
-        passClienteLabel.innerHTML = '<i class="fas fa-user-lock"></i> Crea una contraseña';
+        passEstudianteGroup.style.display = 'block';
+        passEstudianteInput.disabled = false;
+        passEstudianteInput.required = true;
+        passEstudianteLabel.innerHTML = '<i class="fas fa-user-lock"></i> Crea una contraseña';
         passHelper.style.display = 'block'; 
 
         passDocenteGroup.style.display = 'none';
@@ -420,7 +420,7 @@
         footerText.innerText = "Tus datos se usarán de manera Anónima.";
         hideError();
         
-        mainForm.setAttribute('action', '/registroCliente');
+        mainForm.setAttribute('action', '/registroEstudiante');
     }
 
     function setModoAdmin() {
@@ -436,9 +436,9 @@
         correoInput.required = true; 
         correoInput.placeholder = "@yachaytech.com";
 
-        passClienteGroup.style.display = 'none';
-        passClienteInput.disabled = true;
-        passClienteInput.required = false;
+        passEstudianteGroup.style.display = 'none';
+        passEstudianteInput.disabled = true;
+        passEstudianteInput.required = false;
         passHelper.style.display = 'none'; 
 
         passDocenteGroup.style.display = 'block';
@@ -468,9 +468,9 @@
         correoInput.required = true; 
         correoInput.placeholder = "@yachaytech.com";
 
-        passClienteGroup.style.display = 'none';
-        passClienteInput.disabled = true;
-        passClienteInput.required = false;
+        passEstudianteGroup.style.display = 'none';
+        passEstudianteInput.disabled = true;
+        passEstudianteInput.required = false;
         passHelper.style.display = 'none'; 
 
         passDocenteGroup.style.display = 'block';
@@ -494,30 +494,30 @@
     }
 
     function switchToLogin() {
-        if (modoActual === 'clienteLogin') return;
+        if (modoActual === 'estudianteLogin') return;
         if (successDiv) successDiv.style.display = 'none';
         clearAllInputs();
-        setModoClienteLogin();
+        setModoEstudianteLogin();
     }
 
     function switchToRegister() {
-        if (modoActual === 'clienteRegistro') return;
+        if (modoActual === 'estudianteRegistro') return;
         if (successDiv) successDiv.style.display = 'none';
         clearAllInputs();
-        setModoClienteRegistro();
+        setModoEstudianteRegistro();
     }
 
     if (errorDiv) {
         const tipo = errorDiv.getAttribute('data-tipo');
         if (tipo === 'admin') {
             setModoPersonalGenerico(); 
-        } else if (tipo === 'clienteRegistro') {
-            setModoClienteRegistro();
+        } else if (tipo === 'estudianteRegistro') {
+            setModoEstudianteRegistro();
         } else {
-            setModoClienteLogin();
+            setModoEstudianteLogin();
         }
     } else {
-        setModoClienteLogin();
+        setModoEstudianteLogin();
     }
 
     docenteToggle.addEventListener('click', () => {
@@ -525,7 +525,7 @@
         clearAllInputs(); 
 
         if (modoActual === 'docente' || modoActual === 'admin') {
-            setModoClienteLogin();
+            setModoEstudianteLogin();
         } else {
             pinModal.classList.add('active');
             pinInput.value = "";
@@ -536,7 +536,7 @@
 
     function closePinModal() {
         pinModal.classList.remove('active');
-        setModoClienteLogin();
+        setModoEstudianteLogin();
     }
 
     function validatePin() {
@@ -569,10 +569,10 @@
         hideError();
         
         const userEmail = correoInput.value.trim();
-        const passCliente = passClienteInput.value.trim();
+        const passEstudiante = passEstudianteInput.value.trim();
         const passDocente = passDocenteInput.value.trim();
 
-        if (modoActual === 'clienteRegistro' || modoActual === 'clienteLogin') {
+        if (modoActual === 'estudianteRegistro' || modoActual === 'estudianteLogin') {
             
             if (userEmail === "") {
                 e.preventDefault();
@@ -589,36 +589,36 @@
                 return;
             }
 
-            if (passCliente === "") {
+            if (passEstudiante === "") {
                 e.preventDefault();
                 showError("La contraseña es obligatoria.");
-                passClienteInput.value = ""; 
+                passEstudianteInput.value = ""; 
                 return;
             }
 
-            if (modoActual === 'clienteRegistro') {
-                const lowerPass = passCliente.toLowerCase();
+            if (modoActual === 'estudianteRegistro') {
+                const lowerPass = passEstudiante.toLowerCase();
                 if (badWords.some(word => lowerPass.includes(word))) {
                     e.preventDefault();
                     showError("La contraseña contiene lenguaje inapropiado. Usa otra.");
-                    passClienteInput.value = ""; 
+                    passEstudianteInput.value = ""; 
                     return;
                 }
                 
                 const securityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$/;
-                if (!securityRegex.test(passCliente)) {
+                if (!securityRegex.test(passEstudiante)) {
                     e.preventDefault();
                     showError("La contraseña debe tener (Mayúscula, minúscula, un caracter especial y minimo 8 caracteres)");
-                    passClienteInput.value = ""; 
+                    passEstudianteInput.value = ""; 
                     return;
                 }
             }
             
-            if (modoActual === 'clienteLogin') {
+            if (modoActual === 'estudianteLogin') {
                 if (rememberMeCheck.checked) {
                     localStorage.setItem('yt_rememberMe', 'true');
                     localStorage.setItem('yt_correo', userEmail);
-                    localStorage.setItem('yt_pass', passCliente);
+                    localStorage.setItem('yt_pass', passEstudiante);
                 } else {
                     localStorage.removeItem('yt_rememberMe');
                     localStorage.removeItem('yt_correo');
