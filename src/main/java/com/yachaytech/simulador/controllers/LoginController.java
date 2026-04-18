@@ -1,9 +1,10 @@
-package com.yachaytech.encuesta.controllers;
+package com.yachaytech.simulador.controllers;
 
-import com.yachaytech.encuesta.models.Administrador;
-import com.yachaytech.encuesta.models.Estudiante;
-import com.yachaytech.encuesta.repositories.AdministradorRepository;
-import com.yachaytech.encuesta.repositories.EstudianteRepository;
+import com.yachaytech.simulador.models.Administrador;
+import com.yachaytech.simulador.models.Estudiante;
+import com.yachaytech.simulador.repositories.AdministradorRepository;
+import com.yachaytech.simulador.repositories.EstudianteRepository;
+
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
