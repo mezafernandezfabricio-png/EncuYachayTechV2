@@ -1,9 +1,10 @@
-package com.yachaytech.encuesta.repositories;
+package com.yachaytech.simulador.repositories;
 
-import com.yachaytech.encuesta.models.Estudiante;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import com.yachaytech.simulador.models.Estudiante;
 
 @Repository
 public interface EstudianteRepository extends JpaRepository<Estudiante, Long> {

@@ -1,4 +1,4 @@
-package com.yachaytech.encuesta.models;
+package com.yachaytech.simulador.models;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
