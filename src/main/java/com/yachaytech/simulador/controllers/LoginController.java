@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Arrays;
@@ -204,9 +205,12 @@ public class LoginController {
     
     @GetMapping("/simulador")
     public String mostrarSimulador(HttpSession session, Model model) {
-        if (session.getAttribute("estudianteId") == null) {
+        Long estudianteId = (Long) session.getAttribute("estudianteId");
+        if (estudianteId == null) {
             return "redirect:/"; 
         }
+        Estudiante estudiante = estudianteRepository.findById(estudianteId).orElse(null);
+        model.addAttribute("estudiante", estudiante);
         return "SimuladorEstudiante"; 
     }
 
@@ -215,12 +219,10 @@ public class LoginController {
         if (session.getAttribute("adminLogueado") == null || !"ADMINISTRADOR".equals(session.getAttribute("rolAdmin"))) {
             return "redirect:/"; 
         }
-        
         model.addAttribute("rolActual", "ADMINISTRADOR");
         model.addAttribute("nombreAdmin", session.getAttribute("adminNombre"));
         model.addAttribute("estudiantes", estudianteRepository.findAll());
         model.addAttribute("docentes", adminRepository.findByRol("DOCENTE"));
-        
         return "PanelAdministrativo"; 
     }
 
@@ -229,10 +231,9 @@ public class LoginController {
         if (session.getAttribute("adminLogueado") == null || !"DOCENTE".equals(session.getAttribute("rolAdmin"))) {
             return "redirect:/"; 
         }
-        
         model.addAttribute("rolActual", "DOCENTE");
         model.addAttribute("nombreAdmin", session.getAttribute("adminNombre"));
-        
+        model.addAttribute("estudiantes", estudianteRepository.findAll()); 
         return "PanelAdministrativo"; 
     }
     
@@ -301,12 +302,10 @@ public class LoginController {
         
         Administrador docente = adminRepository.findById(id).orElse(null);
         if(docente != null) {
-            
             if (!correo.trim().toLowerCase().endsWith("@cibertec.edu.pe")) {
                 redirectAttributes.addFlashAttribute("errorAdmin", "El correo institucional debe terminar en @cibertec.edu.pe");
                 return "redirect:/admin/panel";
             }
-
             if (!docente.getCorreo().equalsIgnoreCase(correo.trim())) {
                 boolean existeCorreo = adminRepository.findAll().stream().anyMatch(a -> a.getCorreo().equalsIgnoreCase(correo.trim()));
                 if (existeCorreo) {
@@ -314,17 +313,14 @@ public class LoginController {
                     return "redirect:/admin/panel";
                 }
             }
-
             docente.setNombre(nombre.trim());
             docente.setCorreo(correo.trim());
-            
             if(password != null && !password.trim().isEmpty()) {
                 String regexSeguridad = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$";
                 if (!password.matches(regexSeguridad)) {
                     redirectAttributes.addFlashAttribute("errorAdmin", "La nueva contraseña debe tener mayor seguridad.");
                     return "redirect:/admin/panel";
                 }
-
                 String passLower = password.toLowerCase();
                 for (String malaPalabra : PALABRAS_OFENSIVAS) {
                     if (passLower.contains(malaPalabra)) {
@@ -362,7 +358,7 @@ public class LoginController {
     }
 
     @GetMapping("/admin/usuario/toggle/{id}")
-    public String toggleEstudiante(@PathVariable("id") Integer id, HttpSession session) {
+    public String toggleEstudiante(@PathVariable("id") Long id, HttpSession session) {
         if (session.getAttribute("adminLogueado") == null) return "redirect:/"; 
         
         Estudiante estudiante = estudianteRepository.findById(id).orElse(null);
@@ -377,5 +373,118 @@ public class LoginController {
     public String cerrarSesion(HttpSession session) {
         session.invalidate(); 
         return "redirect:/"; 
+    }
+
+    @PostMapping("/docente/asignar-intentos")
+    public String asignarIntentos(@RequestParam("estudianteId") Long estudianteId,
+                                  @RequestParam("limiteIntentos") Integer limiteIntentos,
+                                  HttpSession session,
+                                  RedirectAttributes redirectAttributes) {
+        if (session.getAttribute("adminLogueado") == null || !"DOCENTE".equals(session.getAttribute("rolAdmin"))) {
+            return "redirect:/";
+        }
+        if (estudianteId == 0) {
+            List<Estudiante> todos = estudianteRepository.findAll();
+            for (Estudiante e : todos) {
+                e.setIntentosPermitidos(limiteIntentos);
+                estudianteRepository.save(e);
+            }
+        } else {
+            Estudiante e = estudianteRepository.findById(estudianteId).orElse(null);
+            if (e != null) {
+                e.setIntentosPermitidos(limiteIntentos);
+                estudianteRepository.save(e);
+            }
+        }
+        redirectAttributes.addFlashAttribute("successAdmin", "Límites de intentos actualizados correctamente.");
+        return "redirect:/docente/panel";
+    }
+
+    @PostMapping("/api/simulacion/alerta-mostrada")
+    @ResponseBody
+    public String alertaMostrada(HttpSession session) {
+        Long id = (Long) session.getAttribute("estudianteId");
+        if (id != null) {
+            Estudiante e = estudianteRepository.findById(id).orElse(null);
+            if (e != null) { e.setAlertaMostrada(true); estudianteRepository.save(e); }
+        }
+        return "OK";
+    }
+
+    @PostMapping("/api/simulacion/progreso")
+    @ResponseBody
+    public String guardarProgreso(@RequestParam("paso") Integer paso, 
+                                  @RequestParam(value="estado", required=false) String estado,
+                                  HttpSession session) {
+        Long id = (Long) session.getAttribute("estudianteId");
+        if (id != null) {
+            Estudiante e = estudianteRepository.findById(id).orElse(null);
+            if (e != null) { 
+                e.setPasoActual(paso); 
+                if (estado != null) e.setEstadoSimulacion(estado);
+                estudianteRepository.save(e); 
+            }
+        }
+        return "OK";
+    }
+
+    @PostMapping("/api/simulacion/guardar-detalles")
+    @ResponseBody
+    public String guardarDetalles(@RequestParam("resA") String resA, @RequestParam("resB") String resB, @RequestParam("resC") String resC,
+                                  @RequestParam("resHijo") String resHijo, @RequestParam("resPadre") String resPadre,
+                                  @RequestParam("resEje1") String resEje1, @RequestParam("resEje2") String resEje2, @RequestParam("resEje3") String resEje3,
+                                  HttpSession session) {
+        Long id = (Long) session.getAttribute("estudianteId");
+        if (id != null) {
+            Estudiante e = estudianteRepository.findById(id).orElse(null);
+            if (e != null) { 
+                e.setResA(resA); e.setResB(resB); e.setResC(resC);
+                e.setResHijo(resHijo); e.setResPadre(resPadre);
+                e.setResEje1(resEje1); e.setResEje2(resEje2); e.setResEje3(resEje3);
+                estudianteRepository.save(e); 
+            }
+        }
+        return "OK";
+    }
+
+    @PostMapping("/api/simulacion/finalizar")
+    @ResponseBody
+    public String finalizar(@RequestParam("puntaje") Double puntaje, HttpSession session) {
+        Long id = (Long) session.getAttribute("estudianteId");
+        if (id != null) {
+            Estudiante e = estudianteRepository.findById(id).orElse(null);
+            if (e != null && !"FINALIZADO".equals(e.getEstadoSimulacion())) { 
+                e.setEstadoSimulacion("FINALIZADO");
+                e.setPuntajeTotal(puntaje);
+                e.setIntentosRealizados(e.getIntentosRealizados() + 1);
+                e.setPasoActual(14); 
+                estudianteRepository.save(e); 
+            }
+        }
+        return "OK";
+    }
+
+    @PostMapping("/api/simulacion/nuevo-intento")
+    @ResponseBody
+    public String nuevoIntento(HttpSession session) {
+        Long id = (Long) session.getAttribute("estudianteId");
+        if (id != null) {
+            Estudiante e = estudianteRepository.findById(id).orElse(null);
+            if (e != null) { 
+                e.setEstadoSimulacion("NO_INICIADO");
+                e.setPuntajeTotal(0.0);
+                e.setPasoActual(4); // Te manda directo al paso 4 (Rol)
+                e.setResA("No respondido");
+                e.setResB("No respondido");
+                e.setResC("No respondido");
+                e.setResHijo("No respondido");
+                e.setResPadre("No respondido");
+                e.setResEje1("No respondido");
+                e.setResEje2("No respondido");
+                e.setResEje3("No respondido");
+                estudianteRepository.save(e); 
+            }
+        }
+        return "OK";
     }
 }

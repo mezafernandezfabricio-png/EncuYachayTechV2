@@ -6,6 +6,7 @@
     <title>Panel de Administración | Yachay Tech</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
@@ -82,8 +83,9 @@
         .badge-status { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
         .status-FINALIZADO { background: #E8F5E9; color: #2E7D32; }
         .status-EN_PROGRESO { background: #FFF3E0; color: #EF6C00; }
+        .status-NO_INICIADO { background: #F5F5F5; color: #757575; border: 1px solid #E0E0E0;}
         .status-ACTIVO { background: #E8F5E9; color: #2E7D32; }
-        .status-PAUSADO { background: #FFEBEE; color: #D32F2F; }
+        .status-INACTIVO { background: #FFEBEE; color: #D32F2F; }
         
         .action-group { display: flex; gap: 10px; }
         .btn-action { background: var(--bg-base); border: 1px solid var(--border-light); padding: 8px 12px; border-radius: 8px; cursor: pointer; color: var(--text-primary); text-decoration: none; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: var(--transition-base); }
@@ -91,9 +93,9 @@
         .btn-download { background: var(--accent-gold); color: white; border: none; }
         .btn-download:hover { background: var(--accent-gold-dark); color: white; }
         .btn-edit { color: #1976D2; }
-        .btn-delete { color: #D32F2F; }
         .btn-pause { color: #F57C00; }
         .btn-play { color: #388E3C; }
+        .btn-delete { color: #D32F2F; }
 
         .crud-toolbar { width: 100%; max-width: 1000px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .btn-primary { background: var(--accent-deep); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: var(--transition-base); }
@@ -102,19 +104,15 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); display: none; align-items: center; justify-content: center; z-index: 999; opacity: 0; transition: opacity 0.3s ease; }
         .modal-overlay.active { display: flex; opacity: 1; }
         
-        .modal-container { background: var(--surface-white); width: 100%; max-width: 650px; border-radius: var(--radius-card); padding: 40px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative; max-height: 90vh; overflow-y: auto; transform: translateY(20px); transition: transform 0.3s ease; }
+        .modal-container { background: var(--surface-white); width: 100%; max-width: 850px; border-radius: var(--radius-card); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative; max-height: 90vh; overflow-y: auto; transform: translateY(20px); transition: transform 0.3s ease; }
         .modal-overlay.active .modal-container { transform: translateY(0); }
         
-        .close-modal { position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; background: var(--bg-base); border-radius: 50%; border: 1px solid var(--border-light); font-size: 16px; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; transition: var(--transition-base); }
+        .close-modal { position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; background: var(--bg-base); border-radius: 50%; border: 1px solid var(--border-light); font-size: 16px; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; transition: var(--transition-base); z-index: 10;}
         .close-modal:hover { background: #FFEBEE; color: #D32F2F; border-color: #FFCDD2; }
         
         .modal-header h3 { font-family: 'Playfair Display', serif; color: var(--text-primary); font-size: 24px; margin-bottom: 5px; }
         .modal-header p { color: var(--text-muted); font-size: 14px; margin-bottom: 25px; border-bottom: 1px solid var(--border-light); padding-bottom: 20px; }
-        
-        .answer-group { margin-bottom: 20px; }
-        .answer-group h4 { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-        .answer-group p { font-size: 15px; color: var(--text-primary); font-weight: 500; background: var(--bg-base); padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border-light); }
-        
+
         .form-group { margin-bottom: 20px; text-align: left; }
         .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; color: var(--text-primary); }
         .form-group label i { color: var(--accent-gold); margin-right: 6px; }
@@ -122,14 +120,14 @@
         .form-group input[type="email"], 
         .form-group input[type="password"], 
         .form-group input[type="number"],
-        .form-group textarea { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border-light); border-radius: 12px; background-color: #FEFCF8; font-family: 'Inter', sans-serif; font-size: 14px; outline: none; transition: var(--transition-base); }
-        .form-group input:focus, .form-group textarea:focus { border-color: var(--accent-gold); background-color: white; box-shadow: 0 0 0 3px rgba(180, 140, 72, 0.15); }
+        .form-group textarea,
+        .form-group select { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border-light); border-radius: 12px; background-color: #FEFCF8; font-family: 'Inter', sans-serif; font-size: 14px; outline: none; transition: var(--transition-base); }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--accent-gold); background-color: white; box-shadow: 0 0 0 3px rgba(180, 140, 72, 0.15); }
         
         .form-group textarea { resize: vertical; min-height: 80px; }
         
-        .option-row { display: flex; gap: 15px; align-items: center; margin-bottom: 12px; }
-        .option-row input[type="radio"] { width: auto; transform: scale(1.3); accent-color: var(--accent-gold); cursor: pointer; margin-left: 5px; }
-        .option-row .radio-label { font-size: 14px; font-weight: 600; color: var(--text-secondary); width: 25px; }
+        .option-row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+        .option-row .radio-label { font-size: 14px; font-weight: 600; color: var(--text-secondary); width: 20px; }
         
     </style>
     
@@ -237,13 +235,13 @@
         <div id="sec-mantenimiento" class="content-area" style="display: none;" th:if="${rolActual == 'ADMINISTRADOR'}">
             <div class="dashboard-header">
                 <h2>Mantenimiento de Simulación</h2>
-                <p>Gestione las preguntas, opciones múltiples y puntajes del caso Yachay Tech.</p>
+                <p>Gestione las fases, escenarios y puntajes del caso Yachay Tech.</p>
             </div>
 
             <div class="crud-toolbar">
-                <p style="font-size: 14px; color: var(--text-secondary); font-weight: 500;">Banco de Preguntas</p>
+                <p style="font-size: 14px; color: var(--text-secondary); font-weight: 500;">Banco de Fases / Escenarios</p>
                 <button class="btn-primary" onclick="abrirModalMantenimiento('crear')">
-                    <i class="fas fa-plus"></i> Nueva Pregunta
+                    <i class="fas fa-plus"></i> Nuevo Escenario
                 </button>
             </div>
 
@@ -252,17 +250,17 @@
                     <tr>
                         <th style="width: 50px;">ID</th>
                         <th>Fase</th>
-                        <th style="width: 45%;">Pregunta (Enunciado)</th>
-                        <th>Puntaje</th>
+                        <th style="width: 45%;">Escenario (Enunciado)</th>
+                        <th>Puntajes</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="pregunta : ${preguntas}">
                         <td style="font-weight: 500;" th:text="'#' + ${pregunta.id}">#01</td>
-                        <td th:text="${pregunta.fase}">Estímulos</td>
-                        <td th:text="${pregunta.enunciado}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px;">¿Cuál es tu primera recomendación estratégica...?</td>
-                        <td th:text="${pregunta.puntaje} + ' pts'">+2 pts</td>
+                        <td th:text="${pregunta.fase}">Análisis</td>
+                        <td th:text="${pregunta.enunciado}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px;">Escenario inicial...</td>
+                        <td>Múltiples (Según opción)</td>
                         <td>
                             <div class="action-group">
                                 <button class="btn-action btn-edit" 
@@ -271,11 +269,13 @@
                                         th:data-fase="${pregunta.fase}"
                                         th:data-enunciado="${pregunta.enunciado}"
                                         th:data-opciona="${pregunta.opcionA}"
+                                        th:data-puntajea="${pregunta.puntajeA}"
                                         th:data-opcionb="${pregunta.opcionB}"
+                                        th:data-puntajeb="${pregunta.puntajeB}"
                                         th:data-opcionc="${pregunta.opcionC}"
+                                        th:data-puntajec="${pregunta.puntajeC}"
                                         th:data-opciond="${pregunta.opcionD}"
-                                        th:data-correcta="${pregunta.respuestaCorrecta}"
-                                        th:data-puntaje="${pregunta.puntaje}"
+                                        th:data-puntajed="${pregunta.puntajeD}"
                                         onclick="botonEditarMantenimiento(this)">
                                     <i class="fas fa-edit"></i> Editar
                                 </button>
@@ -287,7 +287,7 @@
                         </td>
                     </tr>
                     <tr th:if="${preguntas == null or preguntas.isEmpty()}">
-                        <td colspan="5" style="text-align: center; color: var(--text-muted);">No hay preguntas de simulación registradas.</td>
+                        <td colspan="5" style="text-align: center; color: var(--text-muted);">No hay fases de simulación registradas.</td>
                     </tr>
                 </tbody>
             </table>
@@ -318,14 +318,14 @@
                         <td th:text="${estudiante.correo}">correo@cibertec.edu.pe</td>
                         <td>
                             <span class="badge-status" 
-                                  th:classappend="${estudiante.estado} ? 'status-ACTIVO' : 'status-PAUSADO'"
-                                  th:text="${estudiante.estado} ? 'ACTIVO' : 'PAUSADO'">ACTIVO</span>
+                                  th:classappend="${estudiante.estado} ? 'status-ACTIVO' : 'status-INACTIVO'"
+                                  th:text="${estudiante.estado} ? 'ACTIVO' : 'INACTIVO'">ACTIVO</span>
                         </td>
                         <td>
                             <div class="action-group">
                                 <button th:if="${estudiante.estado}" class="btn-action btn-pause" 
                                         th:onclick="'window.location.href=\'/admin/usuario/toggle/' + ${estudiante.id} + '\''">
-                                    <i class="fas fa-pause-circle"></i> Pausar
+                                    <i class="fas fa-pause-circle"></i> Inactivar
                                 </button>
                                 
                                 <button th:unless="${estudiante.estado}" class="btn-action btn-play" 
@@ -382,8 +382,8 @@
                         <td th:text="${docente.correo}">correo@yachaytech.com</td>
                         <td>
                             <span class="badge-status" 
-                                  th:classappend="${docente.estado} ? 'status-ACTIVO' : 'status-PAUSADO'"
-                                  th:text="${docente.estado} ? 'ACTIVO' : 'PAUSADO'">ACTIVO</span>
+                                  th:classappend="${docente.estado} ? 'status-ACTIVO' : 'status-INACTIVO'"
+                                  th:text="${docente.estado} ? 'ACTIVO' : 'INACTIVO'">ACTIVO</span>
                         </td>
                         <td>
                             <div class="action-group">
@@ -398,17 +398,13 @@
                                 
                                 <button th:if="${docente.estado}" class="btn-action btn-pause" 
                                         th:onclick="'window.location.href=\'/admin/docente/toggle/' + ${docente.id} + '\''">
-                                    <i class="fas fa-pause-circle"></i> Pausar
+                                    <i class="fas fa-pause-circle"></i> Inactivar
                                 </button>
                                 
                                 <button th:unless="${docente.estado}" class="btn-action btn-play" 
                                         th:onclick="'window.location.href=\'/admin/docente/toggle/' + ${docente.id} + '\''">
                                     <i class="fas fa-play-circle"></i> Activar
                                 </button>
-								<button class="btn-action btn-delete" 
-								                                th:onclick="|abrirModalEliminar(${docente.id})|">
-								                            <i class="fas fa-trash-alt"></i> Eliminar
-								                        </button>
                             </div>
                         </td>
                     </tr>
@@ -424,51 +420,51 @@
                 <h2>Progreso de Estudiantes</h2>
                 <p>Revise las decisiones tomadas por los alumnos y descargue sus informes.</p>
             </div>
+            
+            <div th:if="${successAdmin != null}" style="background: #E8F5E9; color: #2E7D32; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; width: 100%; max-width: 1000px; text-align: center; font-weight: 500; border: 1px solid #C8E6C9;">
+                <i class="fas fa-check-circle"></i> <span th:text="${successAdmin}">Éxito</span>
+            </div>
+
+            <div class="crud-toolbar">
+                <p style="font-size: 14px; color: var(--text-secondary); font-weight: 500;">Reportes Entregados</p>
+                <button class="btn-primary" onclick="abrirModalIntentos()">
+                    <i class="fas fa-sliders-h"></i> Configurar Intentos
+                </button>
+            </div>
 
             <table class="data-table">
                 <thead>
                     <tr>
                         <th>Estudiante</th>
                         <th>Correo Cibertec</th>
+                        <th>Intentos</th>
                         <th>Estado</th>
                         <th>Puntaje</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="sim : ${simulaciones}">
-                        <td style="font-weight: 500;" th:text="${sim.cliente.nombre}">Juan Pérez</td>
-                        <td th:text="${sim.cliente.correo}">i202400000@cibertec.edu.pe</td>
+                    <tr th:each="est : ${estudiantes}">
+                        <td style="font-weight: 500;" th:text="${est.nombre}">Juan Pérez</td>
+                        <td th:text="${est.correo}">i202400000@cibertec.edu.pe</td>
+                        <td th:text="${est.intentosRealizados} + ' / ' + (${est.intentosPermitidos == 0 ? '∞' : est.intentosPermitidos})">1 / ∞</td>
                         <td>
                             <span class="badge-status" 
-                                  th:classappend="'status-' + ${sim.estado}" 
-                                  th:text="${sim.estado}">EN_PROGRESO</span>
+                                  th:classappend="'status-' + ${est.estadoSimulacion}" 
+                                  th:text="${est.estadoSimulacion}">NO_INICIADO</span>
                         </td>
-                        <td th:text="${sim.puntajeTotal} + ' pts'">15 pts</td>
+                        <td th:text="${est.puntajeTotal} + ' pts'">15 pts</td>
                         <td>
                             <div class="action-group">
-                                <button class="btn-action" th:onclick="'abrirModal(' + ${sim.id} + ')'">
-                                    <i class="far fa-eye"></i> Ver Respuestas
-                                </button>
-                                
-                                <a th:href="@{/admin/reporte/pdf/{id}(id=${sim.id})}" class="btn-action btn-download">
+                                <button type="button" class="btn-action btn-download" th:onclick="'descargarPDFDocente(' + ${est.id} + ')'">
                                     <i class="fas fa-download"></i> PDF
-                                </a>
+                                </button>
                             </div>
                         </td>
                     </tr>
                     
-                    <tr th:if="${simulaciones == null or simulaciones.isEmpty()}">
-                        <td style="font-weight: 500;">Ejemplo Alumno</td>
-                        <td>i202409000@cibertec.edu.pe</td>
-                        <td><span class="badge-status status-FINALIZADO">FINALIZADO</span></td>
-                        <td>18 pts</td>
-                        <td>
-                            <div class="action-group">
-                                <button class="btn-action" onclick="abrirModal('ejemplo')"><i class="far fa-eye"></i> Ver Respuestas</button>
-                                <a href="#" class="btn-action btn-download"><i class="fas fa-download"></i> PDF</a>
-                            </div>
-                        </td>
+                    <tr th:if="${estudiantes == null or estudiantes.isEmpty()}">
+                        <td colspan="6" style="text-align: center; color: var(--text-muted);">No hay estudiantes registrados.</td>
                     </tr>
                 </tbody>
             </table>
@@ -482,45 +478,116 @@
     <div>© 2026 Yachay Tech — Todos los derechos reservados</div>
 </div>
 
-<div style="display:none;" id="datos-ocultos-simulaciones">
-    <div th:each="sim : ${simulaciones}" th:id="'data-sim-' + ${sim.id}">
-        <div class="answer-group"><h4>Fase 1: Análisis de Escenario</h4><p th:text="${sim.fase1Analisis ?: 'No registrado'} + ' - ' + ${sim.fase1Instrumento ?: ''}">Estímulos - Auditoría de Contenido</p></div>
-        <div class="answer-group"><h4>Fase 2: Buyer Persona Hijo</h4><p th:text="${sim.fase2BuyerHijo ?: 'No registrado'}">Joven universitario de 19 años...</p></div>
-        <div class="answer-group"><h4>Fase 2: Buyer Persona Padre</h4><p th:text="${sim.fase2BuyerPadre ?: 'No registrado'}">Hombre de 45-55 años, clase media...</p></div>
-        <div class="answer-group"><h4>Fase 3: Eje Estratégico</h4><p th:text="${sim.fase3Eje ?: 'No registrado'} + ' - ' + ${sim.fase3Insight ?: ''}">Precio vs Calidad - Calidad accesible con respaldo local</p></div>
-    </div>
-    
-    <div id="data-sim-ejemplo">
-        <div class="answer-group"><h4>Fase 1: Análisis de Escenario</h4><p>Análisis de Estímulos - Prueba de Rendimiento Crítico de Yachay-Hub</p></div>
-        <div class="answer-group"><h4>Fase 2: Buyer Persona Hijo</h4><p>(+2.5) Joven universitario de 19 años, motivado por el rendimiento académico...</p></div>
-        <div class="answer-group"><h4>Fase 2: Buyer Persona Padre</h4><p>(+2.5) Hombre de 45-55 años, trabajador de clase media en provincia...</p></div>
-        <div class="answer-group"><h4>Fase 3: Eje Estratégico</h4><p>Eje Precio vs. Calidad - (+3) "Calidad accesible con respaldo local"</p></div>
+<div style="position: absolute; left: -9999px; top: 0;" id="datos-ocultos-simulaciones">
+    <div th:each="est : ${estudiantes}" th:id="'data-sim-' + ${est.id}" style="display: none;">
+        <div style="width: 850px; padding: 40px; box-sizing: border-box; background: white; font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333;">
+            
+            <div style="display: block; border-bottom: 3px solid #2C3E2F; padding-bottom: 15px; margin-bottom: 25px;">
+                <div style="float: right; text-align: right; margin-top: 10px;">
+                    <span style="background: #E8F5E9; color: #2E7D32; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase;" th:text="${est.estadoSimulacion}"></span>
+                </div>
+                <h1 style="color: #2C3E2F; font-size: 32px; margin: 0; font-weight: 800; letter-spacing: 1px;">YACHAY TECH</h1>
+                <p style="color: #B48C48; margin: 2px 0; font-size: 14px; text-transform: uppercase; font-weight: bold;">Informe de Consultoría Estratégica</p>
+                <div style="margin-top: 10px; font-size: 12px; color: #555;">
+                    <p th:text="'Consultor: ' + ${est.nombre}"></p>
+                    <p th:text="'Correo: ' + ${est.correo}"></p>
+                </div>
+                <div style="clear: both;"></div>
+            </div>
+
+            <div style="background: #FAF9F6; border: 1px solid #EAE7E2; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 30px; page-break-inside: avoid; break-inside: avoid;">
+                <p style="font-size: 12px; color: #8A8A8A; text-transform: uppercase; font-weight: bold; margin-bottom: 5px;">Puntaje Final</p>
+                <h2 style="color: #9B723C; font-size: 40px; margin: 0; font-weight: 800;" th:text="${est.puntajeTotal} + ' / 20'">0 / 20</h2>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <h3 style="color: #2C3E2F; border-bottom: 2px solid #B48C48; padding-bottom: 5px; font-size: 18px; margin-bottom: 15px;">1. Fase 1: Análisis e Investigación</h3>
+                <div style="margin-bottom: 15px; padding: 15px; background: #FCFAF7; border-radius: 8px; border: 1px solid #EAE7E2; page-break-inside: avoid; break-inside: avoid;">
+                    <h4 style="margin: 0 0 8px 0; color: #2C3E2F; font-size: 16px;">Análisis de Estímulos</h4>
+                    <p style="margin: 0; font-size: 14px; color: #5A5A5A;"><strong>Decisión:</strong> <span th:text="${est.resA}"></span></p>
+                </div>
+                <div style="margin-bottom: 15px; padding: 15px; background: #FCFAF7; border-radius: 8px; border: 1px solid #EAE7E2; page-break-inside: avoid; break-inside: avoid;">
+                    <h4 style="margin: 0 0 8px 0; color: #2C3E2F; font-size: 16px;">Toma de Decisiones</h4>
+                    <p style="margin: 0; font-size: 14px; color: #5A5A5A;"><strong>Decisión:</strong> <span th:text="${est.resB}"></span></p>
+                </div>
+                <div style="margin-bottom: 15px; padding: 15px; background: #FCFAF7; border-radius: 8px; border: 1px solid #EAE7E2; page-break-inside: avoid; break-inside: avoid;">
+                    <h4 style="margin: 0 0 8px 0; color: #2C3E2F; font-size: 16px;">Actitudes y Creencias</h4>
+                    <p style="margin: 0; font-size: 14px; color: #5A5A5A;"><strong>Decisión:</strong> <span th:text="${est.resC}"></span></p>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <h3 style="color: #2C3E2F; border-bottom: 2px solid #B48C48; padding-bottom: 5px; font-size: 18px; margin-bottom: 15px;">2. Fase 2: Buyer Personas</h3>
+                <div style="margin-bottom: 15px; padding: 15px; background: #FCFAF7; border-radius: 8px; border: 1px solid #EAE7E2; page-break-inside: avoid; break-inside: avoid;">
+                    <h4 style="margin: 0 0 8px 0; color: #2C3E2F; font-size: 16px;">Buyer Persona: El Hijo</h4>
+                    <p style="margin: 0; font-size: 14px; color: #5A5A5A;"><strong>Perfil Seleccionado:</strong> <span th:text="${est.resHijo}"></span></p>
+                </div>
+                <div style="margin-bottom: 15px; padding: 15px; background: #FCFAF7; border-radius: 8px; border: 1px solid #EAE7E2; page-break-inside: avoid; break-inside: avoid;">
+                    <h4 style="margin: 0 0 8px 0; color: #2C3E2F; font-size: 16px;">Buyer Persona: El Padre</h4>
+                    <p style="margin: 0; font-size: 14px; color: #5A5A5A;"><strong>Perfil Seleccionado:</strong> <span th:text="${est.resPadre}"></span></p>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <h3 style="color: #2C3E2F; border-bottom: 2px solid #B48C48; padding-bottom: 5px; font-size: 18px; margin-bottom: 15px;">3. Fase 3: Estrategia de Posicionamiento</h3>
+                <div style="margin-bottom: 15px; padding: 15px; background: #FCFAF7; border-radius: 8px; border: 1px solid #EAE7E2; page-break-inside: avoid; break-inside: avoid;">
+                    <h4 style="margin: 0 0 8px 0; color: #2C3E2F; font-size: 16px;">Eje Precio vs. Calidad</h4>
+                    <p style="margin: 0; font-size: 14px; color: #5A5A5A;"><strong>Estrategia:</strong> <span th:text="${est.resEje1}"></span></p>
+                </div>
+                <div style="margin-bottom: 15px; padding: 15px; background: #FCFAF7; border-radius: 8px; border: 1px solid #EAE7E2; page-break-inside: avoid; break-inside: avoid;">
+                    <h4 style="margin: 0 0 8px 0; color: #2C3E2F; font-size: 16px;">Eje Innovación vs. Diseño</h4>
+                    <p style="margin: 0; font-size: 14px; color: #5A5A5A;"><strong>Estrategia:</strong> <span th:text="${est.resEje2}"></span></p>
+                </div>
+                <div style="margin-bottom: 15px; padding: 15px; background: #FCFAF7; border-radius: 8px; border: 1px solid #EAE7E2; page-break-inside: avoid; break-inside: avoid;">
+                    <h4 style="margin: 0 0 8px 0; color: #2C3E2F; font-size: 16px;">Eje Prestigio vs. Experiencia</h4>
+                    <p style="margin: 0; font-size: 14px; color: #5A5A5A;"><strong>Estrategia:</strong> <span th:text="${est.resEje3}"></span></p>
+                </div>
+            </div>
+
+        </div>
     </div>
 </div>
 
-<div class="modal-overlay" id="modalDetalle">
-    <div class="modal-container">
-        <button class="close-modal" onclick="cerrarModal()"><i class="fas fa-times"></i></button>
+<div class="modal-overlay" id="modalIntentos">
+    <div class="modal-container" style="max-width: 500px; padding: 40px;">
+        <button class="close-modal" onclick="cerrarModalIntentos()"><i class="fas fa-times"></i></button>
         <div class="modal-header">
-            <h3>Detalle de Decisiones</h3>
-            <p>Respuestas exactas registradas en el simulador por el estudiante (Modo Solo Lectura).</p>
+            <h3>Configurar Intentos</h3>
+            <p>Asigna el límite de intentos para los estudiantes en el simulador.</p>
         </div>
-        
-        <div id="modal-body-content">
+        <form th:action="@{/docente/asignar-intentos}" method="post">
+            <div class="form-group">
+                <label><i class="fas fa-user-graduate"></i> Seleccione un Estudiante</label>
+                <select name="estudianteId" class="form-group input" style="width: 100%; padding: 12px 16px; border: 1.5px solid var(--border-light); border-radius: 12px; background-color: #FEFCF8; font-family: 'Inter', sans-serif; font-size: 14px; outline: none; transition: var(--transition-base);">
+                    <option value="0">Aplicar a TODOS los estudiantes</option>
+                    <option th:each="e : ${estudiantes}" th:value="${e.id}" th:text="${e.nombre} + ' (' + ${e.correo} + ')'"></option>
+                </select>
             </div>
-        
+            
+            <div class="form-group">
+                <label><i class="fas fa-sort-numeric-up"></i> Límite de Intentos</label>
+                <input type="number" name="limiteIntentos" min="0" max="99" value="0" class="form-group input" style="width: 100%; padding: 12px 16px; border: 1.5px solid var(--border-light); border-radius: 12px; background-color: #FEFCF8; font-family: 'Inter', sans-serif; font-size: 14px; outline: none; transition: var(--transition-base);" placeholder="0 = Ilimitados">
+                <small style="color: var(--text-muted); font-size: 12.5px; margin-top: 6px; display: inline-block;">
+                    <i class="fas fa-info-circle" style="color: var(--info);"></i> Ingrese el número <strong>0</strong> para permitir intentos ilimitados.
+                </small>
+            </div>
+            
+            <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 14px; margin-top: 10px;">
+                <i class="fas fa-save"></i> Guardar Configuración
+            </button>
+        </form>
     </div>
 </div>
 
 <div class="modal-overlay" id="modalDocente">
-    <div class="modal-container" style="max-width: 500px;">
+    <div class="modal-container" style="max-width: 500px; padding: 40px;">
         <button class="close-modal" onclick="cerrarModalDocente()"><i class="fas fa-times"></i></button>
         <div class="modal-header">
             <h3 id="modalDocenteTitulo">Docente</h3>
             <p id="modalDocenteSubtitulo">Complete los datos para continuar.</p>
         </div>
         
-        <form id="formDocente" method="post" style="margin-top: 20px;">
+        <form id="formDocente" method="post" style="margin-top: 20px;" onsubmit="return validarContrasenas()">
             <input type="hidden" id="docenteId" name="id">
             
             <div class="form-group">
@@ -536,7 +603,12 @@
             <div class="form-group">
                 <label for="passwordDocente" id="lblPasswordDocente"><i class="fas fa-key"></i> Contraseña</label>
                 <input type="password" id="passwordDocente" name="password">
-                <small id="passwordHelpText" style="display:none; color: #8A8A8A; margin-top: 5px; display: block;">Deje en blanco para mantener la actual.</small>
+            </div>
+
+            <div class="form-group" id="divConfirmarPass">
+                <label for="confirmPasswordDocente"><i class="fas fa-check-double"></i> Confirmar Contraseña</label>
+                <input type="password" id="confirmPasswordDocente">
+                <small id="passwordHelpText" style="display:none; color: #8A8A8A; margin-top: 5px;">Deje en blanco para mantener la actual.</small>
             </div>
             
             <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 14px;">
@@ -546,95 +618,70 @@
     </div>
 </div>
 
-<div class="modal-overlay" id="modalEliminar">
-    <div class="modal-container" style="max-width: 400px; text-align: center;">
-        <button class="close-modal" onclick="cerrarModalEliminar()"><i class="fas fa-times"></i></button>
-        <div class="modal-header" style="border-bottom: none; padding-bottom: 0;">
-            <div style="font-size: 40px; color: #D32F2F; margin-bottom: 15px;"><i class="fas fa-exclamation-circle"></i></div>
-            <h3 style="margin-bottom: 10px;">Confirmar Eliminación</h3>
-            <p style="border-bottom: none;">¿Estás seguro de que deseas eliminar este docente? Esta acción no se puede deshacer.</p>
-        </div>
-        
-        <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
-            <button class="btn-action" style="padding: 10px 20px;" type="button" onclick="cerrarModalEliminar()">Cancelar</button>
-            <a href="#" id="btnConfirmarEliminar" class="btn-primary" style="background-color: #D32F2F; padding: 10px 20px;">
-                <i class="fas fa-trash-alt"></i> Eliminar
-            </a>
-        </div>
-    </div>
-</div>
-
 <div class="modal-overlay" id="modalMantenimiento">
-    <div class="modal-container" style="max-width: 700px;">
+    <div class="modal-container" style="max-width: 700px; padding: 40px;">
         <button class="close-modal" onclick="cerrarModalMantenimiento()"><i class="fas fa-times"></i></button>
         <div class="modal-header">
-            <h3 id="modalMantenimientoTitulo">Pregunta de Simulación</h3>
-            <p id="modalMantenimientoSubtitulo">Redacta el enunciado, las opciones y marca la respuesta correcta.</p>
+            <h3 id="modalMantenimientoTitulo">Escenario de Simulación</h3>
+            <p id="modalMantenimientoSubtitulo">Redacta el escenario, las opciones y el puntaje individual de cada una.</p>
         </div>
         
         <form id="formMantenimiento" method="post" style="margin-top: 20px;">
             <input type="hidden" id="mantenimientoId" name="id">
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div class="form-group">
-                    <label for="fasePregunta"><i class="fas fa-layer-group"></i> Fase del Simulador</label>
-                    <input type="text" id="fasePregunta" name="fase" placeholder="Ej. Regreso a clases" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="puntajePregunta"><i class="fas fa-star"></i> Puntaje de la Pregunta</label>
-                    <input type="number" step="0.5" id="puntajePregunta" name="puntaje" placeholder="Ej. 2" required>
-                </div>
+            <div class="form-group">
+                <label for="fasePregunta"><i class="fas fa-layer-group"></i> Fase del Simulador</label>
+                <input type="text" id="fasePregunta" name="fase" placeholder="Ej. Fase 1: Análisis de Estímulos" required>
             </div>
             
             <div class="form-group">
-                <label for="enunciadoPregunta"><i class="fas fa-align-left"></i> Enunciado de la Pregunta</label>
-                <textarea id="enunciadoPregunta" name="enunciado" placeholder="Escribe la situación y la pregunta aquí..." required></textarea>
+                <label for="enunciadoPregunta"><i class="fas fa-align-left"></i> Enunciado / Escenario</label>
+                <textarea id="enunciadoPregunta" name="enunciado" placeholder="Escribe la situación o contexto aquí..." required></textarea>
             </div>
 
             <div class="form-group">
-                <label><i class="fas fa-list-ul"></i> Opciones de Respuesta</label>
-                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Escribe las 4 opciones y selecciona el círculo de la respuesta que será correcta.</p>
+                <label><i class="fas fa-list-ul"></i> Opciones de Respuesta y Puntajes</label>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">En este simulador no hay respuestas incorrectas. Asigna un puntaje a cada opción según su impacto estratégico.</p>
 
                 <div class="option-row">
-                    <input type="radio" name="respuestaCorrecta" value="A" id="correctaA" required title="Marcar como correcta">
                     <span class="radio-label">A)</span>
-                    <input type="text" id="opcionA" name="opcionA" placeholder="Opción A..." required>
+                    <input type="text" id="opcionA" name="opcionA" placeholder="Texto de la opción A..." style="flex: 1;" required>
+                    <input type="number" step="0.5" id="puntajeA" name="puntajeA" placeholder="Pts (ej. 3)" style="width: 100px;" required>
                 </div>
                 
                 <div class="option-row">
-                    <input type="radio" name="respuestaCorrecta" value="B" id="correctaB" required title="Marcar como correcta">
                     <span class="radio-label">B)</span>
-                    <input type="text" id="opcionB" name="opcionB" placeholder="Opción B..." required>
+                    <input type="text" id="opcionB" name="opcionB" placeholder="Texto de la opción B..." style="flex: 1;" required>
+                    <input type="number" step="0.5" id="puntajeB" name="puntajeB" placeholder="Pts (ej. 2)" style="width: 100px;" required>
                 </div>
 
                 <div class="option-row">
-                    <input type="radio" name="respuestaCorrecta" value="C" id="correctaC" required title="Marcar como correcta">
                     <span class="radio-label">C)</span>
-                    <input type="text" id="opcionC" name="opcionC" placeholder="Opción C..." required>
+                    <input type="text" id="opcionC" name="opcionC" placeholder="Texto de la opción C (Opcional)..." style="flex: 1;">
+                    <input type="number" step="0.5" id="puntajeC" name="puntajeC" placeholder="Pts (ej. 1)" style="width: 100px;">
                 </div>
 
                 <div class="option-row">
-                    <input type="radio" name="respuestaCorrecta" value="D" id="correctaD" required title="Marcar como correcta">
                     <span class="radio-label">D)</span>
-                    <input type="text" id="opcionD" name="opcionD" placeholder="Opción D..." required>
+                    <input type="text" id="opcionD" name="opcionD" placeholder="Texto de la opción D (Opcional)..." style="flex: 1;">
+                    <input type="number" step="0.5" id="puntajeD" name="puntajeD" placeholder="Pts (ej. 0.5)" style="width: 100px;">
                 </div>
             </div>
             
             <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 14px; margin-top: 10px;">
-                <i class="fas fa-save"></i> <span id="btnTextMantenimiento">Guardar Pregunta</span>
+                <i class="fas fa-save"></i> <span id="btnTextMantenimiento">Guardar Escenario</span>
             </button>
         </form>
     </div>
 </div>
 
 <div class="modal-overlay" id="modalEliminarMantenimiento">
-    <div class="modal-container" style="max-width: 400px; text-align: center;">
+    <div class="modal-container" style="max-width: 400px; text-align: center; padding: 40px;">
         <button class="close-modal" onclick="cerrarModalEliminarMantenimiento()"><i class="fas fa-times"></i></button>
         <div class="modal-header" style="border-bottom: none; padding-bottom: 0;">
             <div style="font-size: 40px; color: #D32F2F; margin-bottom: 15px;"><i class="fas fa-exclamation-circle"></i></div>
             <h3 style="margin-bottom: 10px;">Confirmar Eliminación</h3>
-            <p style="border-bottom: none;">¿Estás seguro de que deseas eliminar esta pregunta? Esta acción no se puede deshacer.</p>
+            <p style="border-bottom: none;">¿Estás seguro de que deseas eliminar este escenario? Esta acción no se puede deshacer.</p>
         </div>
         
         <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
@@ -679,7 +726,7 @@
         
         if (menuActivo) menuActivo.classList.add('active');
         if (contentActivo) {
-            contentActivo.style.display = (seccion === 'inicio') ? 'flex' : 'flex';
+            contentActivo.style.display = 'flex';
             contentActivo.style.flexDirection = 'column';
         }
         
@@ -695,18 +742,50 @@
         }
     });
 
-    function abrirModal(simId) {
-        let dataElement = document.getElementById('data-sim-' + simId);
-        if(dataElement) {
-            document.getElementById('modal-body-content').innerHTML = dataElement.innerHTML;
-        } else {
-            document.getElementById('modal-body-content').innerHTML = "<p>No se encontraron datos detallados.</p>";
+    function validarContrasenas() {
+        const pass = document.getElementById('passwordDocente').value;
+        const confirm = document.getElementById('confirmPasswordDocente').value;
+        const modo = document.getElementById('docenteId').value;
+
+        if (modo === "" && pass === "") {
+            alert("La contraseña es obligatoria para nuevos docentes.");
+            return false;
         }
-        document.getElementById('modalDetalle').classList.add('active');
+
+        if (pass !== confirm) {
+            alert("Las contraseñas no coinciden.");
+            return false;
+        }
+        return true;
     }
 
-    function cerrarModal() {
-        document.getElementById('modalDetalle').classList.remove('active');
+	function descargarPDFDocente(id) {
+        const dataElement = document.getElementById('data-sim-' + id);
+        if(!dataElement) return;
+
+        const originalDisplay = dataElement.style.display;
+        dataElement.style.display = 'block';
+
+        const opt = {
+            margin:       [0.5, 0.5, 0.5, 0.5],
+            filename:     'Reporte_Simulacion_YachayTech_' + id + '.pdf',
+            image:        { type: 'jpeg', quality: 1.0 },
+            html2canvas:  { scale: 2, useCORS: true, logging: false }, 
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' },
+            pagebreak:    { mode: ['css', 'legacy'] } 
+        };
+
+        html2pdf().set(opt).from(dataElement).save().then(() => {
+            dataElement.style.display = originalDisplay;
+        });
+    }
+
+    function abrirModalIntentos() {
+        document.getElementById('modalIntentos').classList.add('active');
+    }
+
+    function cerrarModalIntentos() {
+        document.getElementById('modalIntentos').classList.remove('active');
     }
 
     function botonEditarPresionado(btn) {
@@ -722,23 +801,27 @@
         const btnText = document.getElementById('btnTextDocente');
         const helpPass = document.getElementById('passwordHelpText');
         const inputPass = document.getElementById('passwordDocente');
+        const confirmPass = document.getElementById('confirmPasswordDocente');
 
         document.getElementById('docenteId').value = id || '';
         document.getElementById('nombreDocente').value = nombre;
         document.getElementById('correoDocente').value = correo;
         inputPass.value = ''; 
+        confirmPass.value = '';
 
         if (modo === 'crear') {
             titulo.innerText = "Crear Nuevo Docente";
             btnText.innerText = "Guardar Docente";
             form.action = "/admin/crearDocente";
             inputPass.required = true;
+            confirmPass.required = true;
             helpPass.style.display = 'none';
         } else {
             titulo.innerText = "Editar Docente";
             btnText.innerText = "Actualizar Docente";
             form.action = "/admin/editarDocente";
             inputPass.required = false; 
+            confirmPass.required = false;
             helpPass.style.display = 'block';
         }
         document.getElementById('modalDocente').classList.add('active');
@@ -752,64 +835,47 @@
         abrirModalDocente('crear');
     }
 
-    function abrirModalEliminar(id) {
-        const btnConfirmar = document.getElementById('btnConfirmarEliminar');
-        if (btnConfirmar) {
-            btnConfirmar.href = '/admin/docente/eliminar/' + id;
-            document.getElementById('modalEliminar').classList.add('active');
-        }
-    }
-
-    function cerrarModalEliminar() {
-        document.getElementById('modalEliminar').classList.remove('active');
-    }
-
     function botonEditarMantenimiento(btn) {
         const id = btn.getAttribute('data-id');
         const fase = btn.getAttribute('data-fase');
         const enunciado = btn.getAttribute('data-enunciado');
         const opA = btn.getAttribute('data-opciona');
+        const ptA = btn.getAttribute('data-puntajea');
         const opB = btn.getAttribute('data-opcionb');
+        const ptB = btn.getAttribute('data-puntajeb');
         const opC = btn.getAttribute('data-opcionc');
+        const ptC = btn.getAttribute('data-puntajec');
         const opD = btn.getAttribute('data-opciond');
-        const correcta = btn.getAttribute('data-correcta'); 
-        const puntaje = btn.getAttribute('data-puntaje');
+        const ptD = btn.getAttribute('data-puntajed');
         
-        abrirModalMantenimiento('editar', id, fase, enunciado, opA, opB, opC, opD, correcta, puntaje);
+        abrirModalMantenimiento('editar', id, fase, enunciado, opA, ptA, opB, ptB, opC, ptC, opD, ptD);
     }
 
-    function abrirModalMantenimiento(modo, id = null, fase = '', enunciado = '', opA = '', opB = '', opC = '', opD = '', correcta = '', puntaje = '') {
+    function abrirModalMantenimiento(modo, id = null, fase = '', enunciado = '', opA = '', ptA = '', opB = '', ptB = '', opC = '', ptC = '', opD = '', ptD = '') {
         const form = document.getElementById('formMantenimiento');
         const titulo = document.getElementById('modalMantenimientoTitulo');
         const btnText = document.getElementById('btnTextMantenimiento');
 
         document.getElementById('mantenimientoId').value = id || '';
-        document.getElementById('fasePregunta').value = fase;
-        document.getElementById('enunciadoPregunta').value = enunciado;
-        document.getElementById('opcionA').value = opA;
-        document.getElementById('opcionB').value = opB;
-        document.getElementById('opcionC').value = opC;
-        document.getElementById('opcionD').value = opD;
-        document.getElementById('puntajePregunta').value = puntaje;
-        
-        document.getElementById('correctaA').checked = false;
-        document.getElementById('correctaB').checked = false;
-        document.getElementById('correctaC').checked = false;
-        document.getElementById('correctaD').checked = false;
-
-        if (correcta) {
-            const radioCorrecto = document.getElementById('correcta' + correcta);
-            if(radioCorrecto) radioCorrecto.checked = true;
-        }
+        document.getElementById('fasePregunta').value = fase || '';
+        document.getElementById('enunciadoPregunta').value = enunciado || '';
+        document.getElementById('opcionA').value = opA || '';
+        document.getElementById('puntajeA').value = ptA || '';
+        document.getElementById('opcionB').value = opB || '';
+        document.getElementById('puntajeB').value = ptB || '';
+        document.getElementById('opcionC').value = opC || '';
+        document.getElementById('puntajeC').value = ptC || '';
+        document.getElementById('opcionD').value = opD || '';
+        document.getElementById('puntajeD').value = ptD || '';
 
         if (modo === 'crear') {
-            titulo.innerText = "Crear Nueva Pregunta";
-            btnText.innerText = "Guardar Pregunta";
-            form.action = "/admin/mantenimiento/crear"; 
+            titulo.innerText = "Crear Escenario de Simulación";
+            btnText.innerText = "Guardar Escenario";
+            form.action = "/admin/mantenimiento/crear";
         } else {
-            titulo.innerText = "Editar Pregunta";
-            btnText.innerText = "Actualizar Pregunta";
-            form.action = "/admin/mantenimiento/editar"; 
+            titulo.innerText = "Editar Escenario de Simulación";
+            btnText.innerText = "Actualizar Escenario";
+            form.action = "/admin/mantenimiento/editar";
         }
         document.getElementById('modalMantenimiento').classList.add('active');
     }
@@ -820,30 +886,12 @@
 
     function abrirModalEliminarMantenimiento(id) {
         const btnConfirmar = document.getElementById('btnConfirmarEliminarMantenimiento');
-        if (btnConfirmar) {
-            btnConfirmar.href = '/admin/mantenimiento/eliminar/' + id; 
-            document.getElementById('modalEliminarMantenimiento').classList.add('active');
-        }
+        btnConfirmar.href = "/admin/mantenimiento/eliminar/" + id;
+        document.getElementById('modalEliminarMantenimiento').classList.add('active');
     }
 
     function cerrarModalEliminarMantenimiento() {
         document.getElementById('modalEliminarMantenimiento').classList.remove('active');
-    }
-
-    window.onclick = function(event) {
-        const modales = [
-            document.getElementById('modalDetalle'),
-            document.getElementById('modalDocente'),
-            document.getElementById('modalEliminar'),
-            document.getElementById('modalMantenimiento'),
-            document.getElementById('modalEliminarMantenimiento')
-        ];
-        
-        modales.forEach(m => {
-            if (event.target === m) {
-                m.classList.remove('active');
-            }
-        });
     }
 </script>
 </body>
