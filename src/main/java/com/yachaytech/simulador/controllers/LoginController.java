@@ -4,6 +4,7 @@ import com.yachaytech.simulador.models.Administrador;
 import com.yachaytech.simulador.models.Estudiante;
 import com.yachaytech.simulador.repositories.AdministradorRepository;
 import com.yachaytech.simulador.repositories.EstudianteRepository;
+import com.yachaytech.simulador.repositories.PreguntaRepository;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +29,12 @@ public class LoginController {
     @Autowired
     private AdministradorRepository adminRepository;
 
+    @Autowired
+    private PreguntaRepository preguntaRepository;
+
     private static final List<String> PALABRAS_OFENSIVAS = Arrays.asList(
-            "puta", "puto", "mierda", "cabron", "cabròn", "pendejo", 
-            "imbecil", "idiota", "estupido", "estùpido", "perra", 
+            "puta", "puto", "mierda", "cabron", "cabròn", "pendejo",
+            "imbecil", "idiota", "estupido", "estùpido", "perra",
             "maldito", "carajo", "verga", "cojudo", "zorra"
     );
 
@@ -49,19 +53,19 @@ public class LoginController {
         }
         return "Login";
     }
-    
+
     @PostMapping("/loginEstudiante")
     public String loginEstudiante(@RequestParam("correo") String correo,
-                               @RequestParam("passwordEstudiante") String passwordEstudiante,
-                               HttpSession session,
-                               RedirectAttributes redirectAttributes,
-                               Model model) {
-        
+                                  @RequestParam("passwordEstudiante") String passwordEstudiante,
+                                  HttpSession session,
+                                  RedirectAttributes redirectAttributes,
+                                  Model model) {
+
         if (correo == null || correo.trim().isEmpty() || passwordEstudiante == null || passwordEstudiante.trim().isEmpty()) {
             model.addAttribute("error", "El correo y la contraseña son obligatorios.");
             model.addAttribute("tipoError", "estudianteLogin");
             if (correo != null && !correo.trim().isEmpty()) {
-                model.addAttribute("correoIngresado", correo); 
+                model.addAttribute("correoIngresado", correo);
             }
             return "Login";
         }
@@ -73,35 +77,35 @@ public class LoginController {
         }
 
         Estudiante estudiante = estudianteRepository.findByCorreoAndPassword(correo.trim(), passwordEstudiante.trim());
-        
+
         if (estudiante != null) {
             if (estudiante.getEstado() != null && !estudiante.getEstado()) {
                 model.addAttribute("error", "Tu cuenta ha sido pausada por un administrador.");
                 model.addAttribute("tipoError", "estudianteLogin");
-                model.addAttribute("correoIngresado", correo); 
+                model.addAttribute("correoIngresado", correo);
                 return "Login";
             }
-            
+
             session.setAttribute("estudianteId", estudiante.getId());
             session.setAttribute("estudianteNombre", estudiante.getNombre());
-            session.setMaxInactiveInterval(1800); 
+            session.setMaxInactiveInterval(1800);
             redirectAttributes.addFlashAttribute("welcomeUser", estudiante.getNombre());
             return "redirect:/simulador";
         } else {
             model.addAttribute("error", "Credenciales incorrectas o la cuenta no existe.");
             model.addAttribute("tipoError", "estudianteLogin");
-            model.addAttribute("correoIngresado", correo); 
+            model.addAttribute("correoIngresado", correo);
             return "Login";
         }
     }
 
     @PostMapping("/registroEstudiante")
     public String registroEstudiante(@RequestParam("correo") String correo,
-                                  @RequestParam("passwordEstudiante") String passwordEstudiante,
-                                  @RequestParam(value = "curso", required = false) String curso,
-                                  RedirectAttributes redirectAttributes,
-                                  Model model) {
-        
+                                     @RequestParam("passwordEstudiante") String passwordEstudiante,
+                                     @RequestParam(value = "curso", required = false) String curso,
+                                     RedirectAttributes redirectAttributes,
+                                     Model model) {
+
         if (correo == null || correo.trim().isEmpty()) {
             model.addAttribute("error", "El correo institucional es obligatorio.");
             model.addAttribute("tipoError", "estudianteRegistro");
@@ -111,23 +115,23 @@ public class LoginController {
         if (!correo.trim().matches("^i\\d{9}@cibertec\\.edu\\.pe$")) {
             model.addAttribute("error", "El correo debe tener el formato i202409426@cibertec.edu.pe");
             model.addAttribute("tipoError", "estudianteRegistro");
-            return "Login"; 
+            return "Login";
         }
 
         Estudiante existente = estudianteRepository.findByCorreo(correo.trim());
         if (existente != null) {
             model.addAttribute("error", "Ya existe una cuenta con este correo institucional.");
             model.addAttribute("tipoError", "estudianteRegistro");
-            return "Login"; 
+            return "Login";
         }
 
         if (passwordEstudiante == null || passwordEstudiante.trim().isEmpty()) {
             model.addAttribute("error", "La contraseña es obligatoria.");
             model.addAttribute("tipoError", "estudianteRegistro");
-            model.addAttribute("correoIngresado", correo); 
+            model.addAttribute("correoIngresado", correo);
             return "Login";
         }
-        
+
         String regexSeguridad = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$";
         if (!passwordEstudiante.matches(regexSeguridad)) {
             model.addAttribute("error", "La contraseña debe tener más seguridad (Mayúscula, minúscula, caracter especial, minimo 8 caracteres)");
@@ -140,19 +144,19 @@ public class LoginController {
         for (String malaPalabra : PALABRAS_OFENSIVAS) {
             if (passLower.contains(malaPalabra)) {
                 model.addAttribute("error", "La contraseña contiene lenguaje inapropiado. Por favor, usa otra.");
-                model.addAttribute("tipoError", "estudianteRegistro"); 
-                model.addAttribute("correoIngresado", correo); 
+                model.addAttribute("tipoError", "estudianteRegistro");
+                model.addAttribute("correoIngresado", correo);
                 return "Login";
             }
         }
 
         Estudiante estudiante = new Estudiante();
         String nombreGenerado = correo.split("@")[0];
-        estudiante.setNombre(nombreGenerado); 
+        estudiante.setNombre(nombreGenerado);
         estudiante.setCorreo(correo.trim());
         estudiante.setPassword(passwordEstudiante.trim());
-        estudiante.setEstado(true); 
-        
+        estudiante.setEstado(true);
+
         estudianteRepository.save(estudiante);
 
         redirectAttributes.addFlashAttribute("success", "Cuenta creada exitosamente. Ahora puedes iniciar sesión.");
@@ -165,78 +169,84 @@ public class LoginController {
                              HttpSession session,
                              RedirectAttributes redirectAttributes,
                              Model model) {
-        
+
         if (correo == null || correo.trim().isEmpty() || password == null || password.trim().isEmpty()) {
             model.addAttribute("error", "El correo y la contraseña son obligatorios.");
-            model.addAttribute("tipoError", "admin"); 
+            model.addAttribute("tipoError", "admin");
             return "Login";
         }
 
         Administrador admin = adminRepository.findByCorreoAndPassword(correo.trim(), password.trim());
-        
+
         if (admin != null) {
             if (admin.getEstado() != null && !admin.getEstado()) {
                 model.addAttribute("error", "Tu cuenta ha sido pausada por el administrador.");
-                model.addAttribute("tipoError", "admin"); 
-                model.addAttribute("correoIngresado", correo); 
+                model.addAttribute("tipoError", "admin");
+                model.addAttribute("correoIngresado", correo);
                 return "Login";
             }
-            
+
             session.setAttribute("adminLogueado", true);
-            session.setAttribute("rolAdmin", admin.getRol()); 
+            session.setAttribute("rolAdmin", admin.getRol());
             session.setAttribute("adminNombre", admin.getNombre());
-            
-            session.setMaxInactiveInterval(1800); 
+            session.setMaxInactiveInterval(1800);
             redirectAttributes.addFlashAttribute("welcomeUser", admin.getNombre());
-            
+
             if ("ADMINISTRADOR".equals(admin.getRol())) {
                 return "redirect:/admin/panel";
             } else {
                 return "redirect:/docente/panel";
             }
-            
+
         } else {
             model.addAttribute("error", "Credenciales incorrectas o usuario no autorizado.");
-            model.addAttribute("tipoError", "admin"); 
-            model.addAttribute("correoIngresado", correo); 
+            model.addAttribute("tipoError", "admin");
+            model.addAttribute("correoIngresado", correo);
             return "Login";
         }
     }
-    
+
     @GetMapping("/simulador")
     public String mostrarSimulador(HttpSession session, Model model) {
         Long estudianteId = (Long) session.getAttribute("estudianteId");
         if (estudianteId == null) {
-            return "redirect:/"; 
+            return "redirect:/";
         }
         Estudiante estudiante = estudianteRepository.findById(estudianteId).orElse(null);
         model.addAttribute("estudiante", estudiante);
-        return "SimuladorEstudiante"; 
+        return "SimuladorEstudiante";
     }
 
     @GetMapping("/admin/panel")
     public String mostrarPanel(HttpSession session, Model model) {
-        if (session.getAttribute("adminLogueado") == null || !"ADMINISTRADOR".equals(session.getAttribute("rolAdmin"))) {
-            return "redirect:/"; 
+        if (session.getAttribute("adminLogueado") == null
+                || !"ADMINISTRADOR".equals(session.getAttribute("rolAdmin"))) {
+            return "redirect:/";
         }
+
         model.addAttribute("rolActual", "ADMINISTRADOR");
         model.addAttribute("nombreAdmin", session.getAttribute("adminNombre"));
         model.addAttribute("estudiantes", estudianteRepository.findAll());
         model.addAttribute("docentes", adminRepository.findByRol("DOCENTE"));
-        return "PanelAdministrativo"; 
+        model.addAttribute("preguntas", preguntaRepository.findAll());
+
+        return "PanelAdministrativo";
     }
 
     @GetMapping("/docente/panel")
     public String mostrarPanelDocente(HttpSession session, Model model) {
-        if (session.getAttribute("adminLogueado") == null || !"DOCENTE".equals(session.getAttribute("rolAdmin"))) {
-            return "redirect:/"; 
+        if (session.getAttribute("adminLogueado") == null
+                || !"DOCENTE".equals(session.getAttribute("rolAdmin"))) {
+            return "redirect:/";
         }
+
         model.addAttribute("rolActual", "DOCENTE");
         model.addAttribute("nombreAdmin", session.getAttribute("adminNombre"));
-        model.addAttribute("estudiantes", estudianteRepository.findAll()); 
-        return "PanelAdministrativo"; 
+        model.addAttribute("estudiantes", estudianteRepository.findAll());
+
+        return "PanelAdministrativo";
     }
-    
+
     @PostMapping("/admin/crearDocente")
     public String crearDocente(@RequestParam("nombre") String nombre,
                                @RequestParam("correo") String correo,
@@ -244,7 +254,7 @@ public class LoginController {
                                HttpSession session,
                                RedirectAttributes redirectAttributes) {
         if (session.getAttribute("adminLogueado") == null || !"ADMINISTRADOR".equals(session.getAttribute("rolAdmin"))) {
-            return "redirect:/"; 
+            return "redirect:/";
         }
 
         if (correo == null || correo.trim().isEmpty() || password == null || password.trim().isEmpty() || nombre == null || nombre.trim().isEmpty()) {
@@ -282,11 +292,11 @@ public class LoginController {
         docente.setCorreo(correo.trim());
         docente.setPassword(password.trim());
         docente.setRol("DOCENTE");
-        docente.setEstado(true); 
-        
+        docente.setEstado(true);
+
         adminRepository.save(docente);
         redirectAttributes.addFlashAttribute("successAdmin", "Docente creado exitosamente.");
-        return "redirect:/admin/panel"; 
+        return "redirect:/admin/panel";
     }
 
     @PostMapping("/admin/editarDocente")
@@ -297,11 +307,11 @@ public class LoginController {
                                 HttpSession session,
                                 RedirectAttributes redirectAttributes) {
         if (session.getAttribute("adminLogueado") == null || !"ADMINISTRADOR".equals(session.getAttribute("rolAdmin"))) {
-            return "redirect:/"; 
+            return "redirect:/";
         }
-        
+
         Administrador docente = adminRepository.findById(id).orElse(null);
-        if(docente != null) {
+        if (docente != null) {
             if (!correo.trim().toLowerCase().endsWith("@cibertec.edu.pe")) {
                 redirectAttributes.addFlashAttribute("errorAdmin", "El correo institucional debe terminar en @cibertec.edu.pe");
                 return "redirect:/admin/panel";
@@ -315,7 +325,7 @@ public class LoginController {
             }
             docente.setNombre(nombre.trim());
             docente.setCorreo(correo.trim());
-            if(password != null && !password.trim().isEmpty()) {
+            if (password != null && !password.trim().isEmpty()) {
                 String regexSeguridad = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$";
                 if (!password.matches(regexSeguridad)) {
                     redirectAttributes.addFlashAttribute("errorAdmin", "La nueva contraseña debe tener mayor seguridad.");
@@ -339,7 +349,7 @@ public class LoginController {
     @GetMapping("/admin/docente/eliminar/{id}")
     public String eliminarDocente(@PathVariable("id") Integer id, HttpSession session) {
         if (session.getAttribute("adminLogueado") == null || !"ADMINISTRADOR".equals(session.getAttribute("rolAdmin"))) {
-            return "redirect:/"; 
+            return "redirect:/";
         }
         adminRepository.deleteById(id);
         return "redirect:/admin/panel";
@@ -347,8 +357,8 @@ public class LoginController {
 
     @GetMapping("/admin/docente/toggle/{id}")
     public String toggleDocente(@PathVariable("id") Integer id, HttpSession session) {
-        if (session.getAttribute("adminLogueado") == null) return "redirect:/"; 
-        
+        if (session.getAttribute("adminLogueado") == null) return "redirect:/";
+
         Administrador docente = adminRepository.findById(id).orElse(null);
         if (docente != null) {
             docente.setEstado(docente.getEstado() == null ? true : !docente.getEstado());
@@ -359,11 +369,11 @@ public class LoginController {
 
     @GetMapping("/admin/usuario/toggle/{id}")
     public String toggleEstudiante(@PathVariable("id") Long id, HttpSession session) {
-        if (session.getAttribute("adminLogueado") == null) return "redirect:/"; 
-        
+        if (session.getAttribute("adminLogueado") == null) return "redirect:/";
+
         Estudiante estudiante = estudianteRepository.findById(id).orElse(null);
         if (estudiante != null) {
-            estudiante.setEstado(estudiante.getEstado() == null ? true : !estudiante.getEstado()); 
+            estudiante.setEstado(estudiante.getEstado() == null ? true : !estudiante.getEstado());
             estudianteRepository.save(estudiante);
         }
         return "redirect:/admin/panel";
@@ -371,8 +381,8 @@ public class LoginController {
 
     @GetMapping("/logout")
     public String cerrarSesion(HttpSession session) {
-        session.invalidate(); 
-        return "redirect:/"; 
+        session.invalidate();
+        return "redirect:/";
     }
 
     @PostMapping("/docente/asignar-intentos")
@@ -406,23 +416,26 @@ public class LoginController {
         Long id = (Long) session.getAttribute("estudianteId");
         if (id != null) {
             Estudiante e = estudianteRepository.findById(id).orElse(null);
-            if (e != null) { e.setAlertaMostrada(true); estudianteRepository.save(e); }
+            if (e != null) {
+                e.setAlertaMostrada(true);
+                estudianteRepository.save(e);
+            }
         }
         return "OK";
     }
 
     @PostMapping("/api/simulacion/progreso")
     @ResponseBody
-    public String guardarProgreso(@RequestParam("paso") Integer paso, 
-                                  @RequestParam(value="estado", required=false) String estado,
+    public String guardarProgreso(@RequestParam("paso") Integer paso,
+                                  @RequestParam(value = "estado", required = false) String estado,
                                   HttpSession session) {
         Long id = (Long) session.getAttribute("estudianteId");
         if (id != null) {
             Estudiante e = estudianteRepository.findById(id).orElse(null);
-            if (e != null) { 
-                e.setPasoActual(paso); 
+            if (e != null) {
+                e.setPasoActual(paso);
                 if (estado != null) e.setEstadoSimulacion(estado);
-                estudianteRepository.save(e); 
+                estudianteRepository.save(e);
             }
         }
         return "OK";
@@ -430,18 +443,28 @@ public class LoginController {
 
     @PostMapping("/api/simulacion/guardar-detalles")
     @ResponseBody
-    public String guardarDetalles(@RequestParam("resA") String resA, @RequestParam("resB") String resB, @RequestParam("resC") String resC,
-                                  @RequestParam("resHijo") String resHijo, @RequestParam("resPadre") String resPadre,
-                                  @RequestParam("resEje1") String resEje1, @RequestParam("resEje2") String resEje2, @RequestParam("resEje3") String resEje3,
+    public String guardarDetalles(@RequestParam("resA") String resA,
+                                  @RequestParam("resB") String resB,
+                                  @RequestParam("resC") String resC,
+                                  @RequestParam("resHijo") String resHijo,
+                                  @RequestParam("resPadre") String resPadre,
+                                  @RequestParam("resEje1") String resEje1,
+                                  @RequestParam("resEje2") String resEje2,
+                                  @RequestParam("resEje3") String resEje3,
                                   HttpSession session) {
         Long id = (Long) session.getAttribute("estudianteId");
         if (id != null) {
             Estudiante e = estudianteRepository.findById(id).orElse(null);
-            if (e != null) { 
-                e.setResA(resA); e.setResB(resB); e.setResC(resC);
-                e.setResHijo(resHijo); e.setResPadre(resPadre);
-                e.setResEje1(resEje1); e.setResEje2(resEje2); e.setResEje3(resEje3);
-                estudianteRepository.save(e); 
+            if (e != null) {
+                e.setResA(resA);
+                e.setResB(resB);
+                e.setResC(resC);
+                e.setResHijo(resHijo);
+                e.setResPadre(resPadre);
+                e.setResEje1(resEje1);
+                e.setResEje2(resEje2);
+                e.setResEje3(resEje3);
+                estudianteRepository.save(e);
             }
         }
         return "OK";
@@ -453,12 +476,12 @@ public class LoginController {
         Long id = (Long) session.getAttribute("estudianteId");
         if (id != null) {
             Estudiante e = estudianteRepository.findById(id).orElse(null);
-            if (e != null && !"FINALIZADO".equals(e.getEstadoSimulacion())) { 
+            if (e != null && !"FINALIZADO".equals(e.getEstadoSimulacion())) {
                 e.setEstadoSimulacion("FINALIZADO");
                 e.setPuntajeTotal(puntaje);
                 e.setIntentosRealizados(e.getIntentosRealizados() + 1);
-                e.setPasoActual(14); 
-                estudianteRepository.save(e); 
+                e.setPasoActual(14);
+                estudianteRepository.save(e);
             }
         }
         return "OK";
@@ -470,10 +493,10 @@ public class LoginController {
         Long id = (Long) session.getAttribute("estudianteId");
         if (id != null) {
             Estudiante e = estudianteRepository.findById(id).orElse(null);
-            if (e != null) { 
+            if (e != null) {
                 e.setEstadoSimulacion("NO_INICIADO");
                 e.setPuntajeTotal(0.0);
-                e.setPasoActual(4); // Te manda directo al paso 4 (Rol)
+                e.setPasoActual(4);
                 e.setResA("No respondido");
                 e.setResB("No respondido");
                 e.setResC("No respondido");
@@ -482,7 +505,7 @@ public class LoginController {
                 e.setResEje1("No respondido");
                 e.setResEje2("No respondido");
                 e.setResEje3("No respondido");
-                estudianteRepository.save(e); 
+                estudianteRepository.save(e);
             }
         }
         return "OK";
